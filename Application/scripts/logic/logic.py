@@ -3,8 +3,8 @@ import json
 from logger.log import MyLogging
 
 
-super_logger =  MyLogging().setup_logger('logic_logger',
-                                         'Application/logger/logfile_logic.log')
+super_logger = MyLogging().setup_logger('preparing_db_logger',
+                                        'Application/logger/logfile.log')
 
 
 class ConnectionDB:
@@ -19,6 +19,6 @@ class ConnectionDB:
         with open('Application/config.json') as config:
             json_str = config.read()
             json_str = json.loads(json_str)
-        dbname = str(json_str['data_Base']['dbname'])
+        dbname = str(json_str['data_base']['dbname'])
         return (dbname, )
 
