@@ -23,6 +23,58 @@ class PreparDb:
         except Exception:
             super_logger.error('Error foreign_keys_on', exc_info=True)
 
+    def create_pixresolution(self):
+        """This method creates the 'pixresolution' table."""
+        try:
+            with self.connect_db:
+                request = """CREATE TABLE IF NOT EXISTS pixresolution(
+                            id_pixresolution INTEGER PRIMARY KEY
+                            AUTOINCREMENT NOT NULL,
+                            val TEXT NOT NULL,
+                            
+                            )"""
+                self.connect_db.execute(request)
+                self.connect_db.commit()
+        except Exception:
+            super_logger.error('Error create_pixresolution', exc_info=True)       
+
+    def create_iphone(self):
+        """This method creates the 'iphone' table."""
+        try:
+            with self.connect_db:
+                request = """CREATE TABLE IF NOT EXISTS iphone(
+                            id_iphone INTEGER PRIMARY KEY
+                            AUTOINCREMENT NOT NULL,
+
+                            title TEXT NOT NULL,
+                            id_pixresolution INTEGER NOT NULL,
+                            FOREIGN KEY (id_pixresolution)
+                            REFERENCES pixresolution(id_pixresolution)
+                            ON DELETE CASCADE,
+                            UNIQUE(title)
+                            )"""
+                self.connect_db.execute(request)
+                self.connect_db.commit()
+        except Exception:
+            super_logger.error('Error create_iphone', exc_info=True) 
+
+    def create_user(self):
+        """This method creates the 'user' table."""
+        try:
+            with self.connect_db:
+                request = """CREATE TABLE IF NOT EXISTS user(
+                            id_db_user INTEGER PRIMARY KEY
+                            AUTOINCREMENT NOT NULL,groups
+                            id_user TEXT NOT NULL,
+                            id_iphone INTEGER NOT NULL,
+                            FOREIGN KEY (id_iphone)
+                            REFERENCES iphone(id_iphone)
+                            ON DELETE CASCADE,
+                            )"""
+                self.connect_db.execute(request)
+                self.connect_db.commit()
+        except Exception:
+            super_logger.error('Error create_user', exc_info=True)
 
 def main():
     db = PreparDb()
