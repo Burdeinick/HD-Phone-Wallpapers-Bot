@@ -1,9 +1,9 @@
 import json
-from Application.bot import app
+from Application.server_bot import app
 
 
 def main():
-    app.run(*get_config())
+    app.run(*get_config(),debug=True)
 
 def get_config():
     with open('Application/config.json') as config:

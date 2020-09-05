@@ -61,14 +61,15 @@ class PreparDb:
         try:
             with self.connect_db:
                 request = """CREATE TABLE IF NOT EXISTS user(
-                            id_db_user INTEGER PRIMARY KEY
-                            AUTOINCREMENT NOT NULL,groups
-                            id_user TEXT NOT NULL,
-                            id_iphone INTEGER NOT NULL,
-                            FOREIGN KEY (id_iphone)
-                            REFERENCES iphone(id_iphone)
-                            ON DELETE CASCADE
-                            )"""
+                             id_db_user INTEGER PRIMARY KEY
+                             AUTOINCREMENT NOT NULL,
+                             id_user TEXT NOT NULL,
+                             id_iphone INTEGER,
+                             FOREIGN KEY (id_iphone)
+                             REFERENCES iphone(id_iphone)
+                             ON DELETE CASCADE
+                             UNIQUE(id_user)
+                             )"""
                 self.connect_db.execute(request)
                 self.connect_db.commit()
         except Exception:
