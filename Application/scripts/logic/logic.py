@@ -34,11 +34,11 @@ class RequestsDb:
         self.conn = ConnectionDB().conn
         self.cursor = ConnectionDB().cursor
 
-    def add_user_id(self, user_id: str) -> bool:
+    def add_user_info(self, user_id: str) -> bool:
         """ """
         try:
-            request = f"""INSERT INTO user(id_user)
-                          VALUES({user_id})
+            request = f"""INSERT INTO user(user_id, status_start)
+                          VALUES({user_id}, 1)
                        """
             self.conn.execute(request)
             self.conn.commit()
@@ -49,6 +49,20 @@ class RequestsDb:
             return False
 
 
+    def get_user_info(self, user_id: str) -> bool:
+        """ """
+        try:
+            request = f"""SELECT user_id, id_iphone, status_start, status_take_iphone
+                          FROM user
+                          WHERE user_id = '{user_id}'
+                       """
+            self.cursor.execute(request)
+            return self.cursor.fetchall()
+
+        except Exception:
+            super_logger.error('Error get_user_id', exc_info=True)
+
+
 class Telegram:
     """ """
     def __init__(self):
@@ -56,8 +70,28 @@ class Telegram:
 
     def send_message(self, chat_id, text):
         method = "sendMessage"
-        token = ""
+        token = "1389628186:AAFwom4Tc69Me6lbm_Iwv3RHIqK3AvzEYGs"
         url = f"https://api.telegram.org/bot{token}/{method}"
         data = {"chat_id": chat_id, "text": text}
         requests.post(url, data=data)
 
+    def select_iphone(self, user_id):
+        """"""
+        method = "sendMessage"
+        token = "1389628186:AAFwom4Tc69Me6lbm_Iwv3RHIqK3AvzEYGs"
+        url = f"https://api.telegram.org/bot{token}/{method}"
+
+        reply = json.dumps({"keyboard": [[{"text": "Создать доску"}]]})
+
+
+        params = {"chat_id": user_id, "reply_markup": reply}
+        requests.post(url, params)
+
+
+# class HandlerReqDb:
+#     """ """
+#     def __init__(self):
+#         self.connect_db = ConnectionDB().conn
+
+    # def hand_get_user_info(self):
+    #     """ """

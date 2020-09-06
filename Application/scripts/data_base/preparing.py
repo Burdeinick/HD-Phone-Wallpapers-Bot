@@ -63,12 +63,14 @@ class PreparDb:
                 request = """CREATE TABLE IF NOT EXISTS user(
                              id_db_user INTEGER PRIMARY KEY
                              AUTOINCREMENT NOT NULL,
-                             id_user TEXT NOT NULL,
+                             user_id TEXT NOT NULL,
                              id_iphone INTEGER,
+                             status_start INTEGER,
+                             status_take_iphone INTEGER,
                              FOREIGN KEY (id_iphone)
                              REFERENCES iphone(id_iphone)
                              ON DELETE CASCADE
-                             UNIQUE(id_user)
+                             UNIQUE(user_id)
                              )"""
                 self.connect_db.execute(request)
                 self.connect_db.commit()
