@@ -65,8 +65,9 @@ class RequestsDb:
     def get_iphone_info(self) -> list:
         """ """
         try:
-            request = f"""SELECT title
+            request = f"""SELECT title, id_iphone
                           FROM iphone
+                          ORDER BY id_iphone DESC
                        """
             self.cursor.execute(request)
             return self.cursor.fetchall()
@@ -78,35 +79,65 @@ class RequestsDb:
 class Telegram:
     """ """
     def __init__(self):
-        self.cookies = dict()
+        self.request_db = RequestsDb()
+        self.hand_req_db = HandlerReqDb()
 
     def send_message(self, chat_id, text):
-        method = "sendMessage"
-        url = f"https://api.telegram.org/bot{token}/{method}"
-        data = {"chat_id": chat_id, "text": text}
-        requests.post(url, data=data)
+        try:
+            method = "sendMessage"
+            url = f"https://api.telegram.org/bot{token}/{method}"
+            data = {"chat_id": chat_id, "text": text}
+            requests.post(url, data=data)
+
+        except Exception:
+            super_logger.error('Error send_message', exc_info=True) 
 
     def select_iphone(self, user_id):
         """"""
-        method = "sendMessage"
-        url = f"https://api.telegram.org/bot{token}/{method}"
+        try:
+            get_info = self.request_db.get_iphone_info()
+            lst_iphones = self.hand_req_db.hand_iphone_info(get_info)
+            self.button(lst_iphones, user_id)
+
+        except Exception:
+            super_logger.error('Error select_iphone', exc_info=True)
+
+    def get_picture(self, user_id):
+        """ """
+        try:
+            title_button = [[{"text": "Получить обои"}]]
+            self.button(title_button, user_id)
+
+        except Exception:
+            super_logger.error('Error get_picture', exc_info=True)
+
+    def button(self, title_button: list, user_id: str):
+        """ """
+        try:
+            method = "sendMessage"
+            url = f"https://api.telegram.org/bot{token}/{method}"
+            reply = json.dumps({"keyboard": title_button, "resize_keyboard": True})
+            params = {"chat_id": user_id, "reply_markup": reply, "text": "Ok"}
+            a = requests.post(url, params)
+            print(a.content)
+        
+        except Exception:
+            super_logger.error('Error button', exc_info=True)
 
 
-        reply = json.dumps({"keyboard":[[{"text": "Создать доску"}], [{"text": "Создать карточку"}], 
-                            [{"text": "Изменить карточку"}], [{"text": "Удалить доску"}],
-                            [{"text": "Удалить карточку"}], [{"text": "Список досок"}],
-                            [{"text": "Отчёт"}]]})
+class HandlerReqDb:
+    """ """
+    def __init__(self):
+        self.connect_db = ConnectionDB().conn
 
-
-        params = {"chat_id": user_id, "reply_markup": reply, "text": 'rty'}
-        a = requests.post(url, params)
-        print(a.content)
-
-
-# class HandlerReqDb:
-#     """ """
-#     def __init__(self):
-#         self.connect_db = ConnectionDB().conn
-
-    # def hand_get_user_info(self):
-    #     """ """
+    def hand_iphone_info(self, iphone_info: list) -> list:
+        """ """
+        try:
+            buttons_lst = []
+            for i in iphone_info:
+                title_iphone = i[0]
+                buttons_lst.append([{"text": f"{title_iphone}"}])
+            return buttons_lst
+        
+        except Exception:
+            super_logger.error('Error hand_iphone_info', exc_info=True)

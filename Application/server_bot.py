@@ -16,22 +16,24 @@ def receive_update():
     print(req)
     if request.method == "POST":
         req = request.json
-        print(req)
 
-        if req['message']['text'] == '/start':
-            chat_id = req["message"]["chat"]["id"]
-            user_info = request_db.get_user_info(chat_id)
+        # if req['message']['text'] == '/start':
+        #     chat_id = req["message"]["chat"]["id"]
+        #     user_info = request_db.get_user_info(chat_id)
 
-            if user_info:
-                teleg.send_message(chat_id, f"Такой пользователь уже есть е мае")
+        #     if user_info:
+        #         teleg.send_message(chat_id, f"Такой пользователь уже есть е мае")
 
-            else:
-                resp_add_user_info = request_db.add_user_info(chat_id)
-                if resp_add_user_info:
-                    teleg.select_iphone(chat_id)
+        #     else:
+        #         resp_add_user_info = request_db.add_user_info(chat_id)
+        #         if resp_add_user_info:
+        #             teleg.select_iphone(chat_id)
 
-                else:
-                    teleg.send_message(chat_id, f"Не вышло!")
+        #         else:
+        #             teleg.send_message(chat_id, f"Не вышло!")
+
         chat_id = req["message"]["chat"]["id"]
-        teleg.select_iphone(chat_id)          
+        # teleg.select_iphone(chat_id)
+        teleg.get_picture(chat_id)
+       
     return {"ok": True}

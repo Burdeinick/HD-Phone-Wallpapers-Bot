@@ -100,23 +100,24 @@ class PreparDb:
         try:
             with self.connect_db:
                 request = """INSERT INTO iphone(title, id_pixresolution)
-                             VALUES('iPhone 6', 1),
-                                   ('iPhone 6+', 1),
-                                   ('iPhone 6S', 1),
-                                   ('iPhone 6S+', 2),
-                                   ('iPhone SE', 3),
-                                   ('iPhone 7', 1),
-                                   ('iPhone 7+', 1),
-                                   ('iPhone 8', 1),
-                                   ('iPhone 8+', 2),
-                                   ('iPhone X', 4),
-                                   ('iPhone XS', 4),
-                                   ('iPhone XS Max', 5),
-                                   ('iPhone XR', 6),
-                                   ('iPhone 11', 6),
-                                   ('iPhone 11 Pro', 4),
-                                   ('iPhone 11 Pro Max', 5)
-                          """
+                             VALUES ('iPhone SE', 3),
+                                    ('iPhone SE 2', 1),
+                                    ('iPhone 6', 1),
+                                    ('iPhone 6+', 1),
+                                    ('iPhone 6S', 1),
+                                    ('iPhone 6S+', 2),
+                                    ('iPhone 7', 1),
+                                    ('iPhone 7+', 1),
+                                    ('iPhone 8', 1),
+                                    ('iPhone 8+', 2),
+                                    ('iPhone X', 4),
+                                    ('iPhone XS', 4),
+                                    ('iPhone XS Max', 5),
+                                    ('iPhone XR', 6),
+                                    ('iPhone 11', 6),
+                                    ('iPhone 11 Pro', 4),
+                                    ('iPhone 11 Pro Max', 5)
+                           """
                 self.connect_db.execute(request)
                 self.connect_db.commit()
 
