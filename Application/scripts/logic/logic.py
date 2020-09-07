@@ -1,10 +1,10 @@
 import json
 import sqlite3
 import requests
-import sys
-sys.path.insert(0, 'Application')
+# import sys
+# sys.path.insert(0, 'Application')
 from logger.log import MyLogging
-
+from TOKEN import token
 
 
 super_logger = MyLogging().setup_logger('preparing_db_logger',
@@ -49,7 +49,7 @@ class RequestsDb:
             return False
 
 
-    def get_user_info(self, user_id: str) -> bool:
+    def get_user_info(self, user_id: str) -> list:
         """ """
         try:
             request = f"""SELECT user_id, id_iphone, status_start, status_take_iphone
@@ -62,6 +62,18 @@ class RequestsDb:
         except Exception:
             super_logger.error('Error get_user_id', exc_info=True)
 
+    def get_iphone_info(self) -> list:
+        """ """
+        try:
+            request = f"""SELECT title
+                          FROM iphone
+                       """
+            self.cursor.execute(request)
+            return self.cursor.fetchall()
+
+        except Exception:
+            super_logger.error('Error get_iphone_info', exc_info=True)     
+
 
 class Telegram:
     """ """
@@ -70,7 +82,6 @@ class Telegram:
 
     def send_message(self, chat_id, text):
         method = "sendMessage"
-        token = "1389628186:AAFwom4Tc69Me6lbm_Iwv3RHIqK3AvzEYGs"
         url = f"https://api.telegram.org/bot{token}/{method}"
         data = {"chat_id": chat_id, "text": text}
         requests.post(url, data=data)
@@ -78,14 +89,18 @@ class Telegram:
     def select_iphone(self, user_id):
         """"""
         method = "sendMessage"
-        token = "1389628186:AAFwom4Tc69Me6lbm_Iwv3RHIqK3AvzEYGs"
         url = f"https://api.telegram.org/bot{token}/{method}"
 
-        reply = json.dumps({"keyboard": [[{"text": "Создать доску"}]]})
+
+        reply = json.dumps({"keyboard":[[{"text": "Создать доску"}], [{"text": "Создать карточку"}], 
+                            [{"text": "Изменить карточку"}], [{"text": "Удалить доску"}],
+                            [{"text": "Удалить карточку"}], [{"text": "Список досок"}],
+                            [{"text": "Отчёт"}]]})
 
 
-        params = {"chat_id": user_id, "reply_markup": reply}
-        requests.post(url, params)
+        params = {"chat_id": user_id, "reply_markup": reply, "text": 'rty'}
+        a = requests.post(url, params)
+        print(a.content)
 
 
 # class HandlerReqDb:

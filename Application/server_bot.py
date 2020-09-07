@@ -1,7 +1,7 @@
 from flask import Flask, make_response, request
-from Application.scripts.logic.logic import Telegram
-from Application.scripts.logic.logic import RequestsDb
-# from Application.scripts.logic.logic import HandlerReqDb
+from scripts.logic.logic import Telegram
+from scripts.logic.logic import RequestsDb
+# from scripts.logic.logic import HandlerReqDb
 
 
 app = Flask(__name__)
@@ -12,8 +12,11 @@ request_db = RequestsDb()
 
 @app.route("/", methods=["GET", "POST"])
 def receive_update():
+    req = request.json
+    print(req)
     if request.method == "POST":
         req = request.json
+        print(req)
 
         if req['message']['text'] == '/start':
             chat_id = req["message"]["chat"]["id"]
@@ -25,12 +28,10 @@ def receive_update():
             else:
                 resp_add_user_info = request_db.add_user_info(chat_id)
                 if resp_add_user_info:
-                    pass
-                    # teleg.select_iphone(chat_id)
+                    teleg.select_iphone(chat_id)
 
                 else:
                     teleg.send_message(chat_id, f"Не вышло!")
-                
-
-            # print(request.json['message']['text'])
+        chat_id = req["message"]["chat"]["id"]
+        teleg.select_iphone(chat_id)          
     return {"ok": True}

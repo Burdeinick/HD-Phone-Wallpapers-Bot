@@ -1,5 +1,5 @@
 import json
-from Application.server_bot import app
+from server_bot import app
 
 
 def main():
