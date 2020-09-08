@@ -1,8 +1,6 @@
 import json
 import sqlite3
 import requests
-# import sys
-# sys.path.insert(0, 'Application')
 from logger.log import MyLogging
 from TOKEN import token
 
@@ -90,6 +88,25 @@ class RequestsDb:
             super_logger.error('Error', exc_info=True)
             return False
 
+    def set_id_iphone(self, user_id: str, text_message: str):
+        """ """
+        try:
+            request = f"""UPDATE user
+                          SET id_iphone = (
+                                            SELECT id_iphone
+                                            FROM iphone
+                                            WHERE title = '{text_message}'
+                                            )
+                          WHERE user_id = {user_id}
+                       """
+            self.conn.execute(request)
+            self.conn.commit()
+            return True
+
+        except Exception:
+            super_logger.error('Error', exc_info=True)
+            return False
+
 class Telegram:
     """ """
     def __init__(self):
@@ -97,6 +114,7 @@ class Telegram:
         self.hand_req_db = HandlerReqDb()
 
     def send_message(self, chat_id, text):
+        """"""
         try:
             method = "sendMessage"
             url = f"https://api.telegram.org/bot{token}/{method}"
@@ -137,6 +155,38 @@ class Telegram:
         
         except Exception:
             super_logger.error('Error button', exc_info=True)
+
+    def send_photo(self, chat_id: str):
+        """ """
+        try:
+            method = "sendPhoto"
+            url = f"https://api.telegram.org/bot{token}/{method}"
+            data = {"chat_id": chat_id, "photo": "https://picsum.photos/id/237/200/300"}
+            requests.post(url, data=data)
+
+        except Exception:
+            super_logger.error('Error send_photo', exc_info=True) 
+
+
+
+
+
+
+
+
+    def get_picture_req(self):
+        """ """
+        pass
+
+
+
+
+
+
+
+
+
+
 
 
 class HandlerReqDb:
