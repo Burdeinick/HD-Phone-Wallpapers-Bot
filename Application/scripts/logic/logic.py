@@ -178,3 +178,16 @@ class HandlerReqDb:
 
         except Exception:
             super_logger.error('Error get_iphone_list', exc_info=True)
+
+    def get_status_take_iphone(self, user_id: str ) -> bool:
+        """ """
+        try:
+            user_info = self.request_db.get_user_info(user_id)
+            if user_info:
+                status_take_iphone = user_info[0][3]
+                if status_take_iphone:
+                    return True
+                return False
+
+        except Exception:
+            super_logger.error('Error get_status_take_iphone', exc_info=True)

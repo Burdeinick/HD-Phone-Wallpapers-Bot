@@ -24,7 +24,11 @@ def receive_update():
                 if add_user:
                     teleg.select_iphone(chat_id)
             else:
-                pass
+                status_take_iphone = hand_req_db.get_status_take_iphone(chat_id)
+                if status_take_iphone:
+                    teleg.get_picture(chat_id)
+                else:
+                    teleg.select_iphone(chat_id)
         
         if text_message in hand_req_db.get_iphone_list():
             user_exist = hand_req_db.user_exist(chat_id)
@@ -32,6 +36,7 @@ def receive_update():
                 set_take_iphone = request_db.set_status_take_iphone(chat_id)
                 if set_take_iphone:
                     teleg.get_picture(chat_id)
+
 
 
 
