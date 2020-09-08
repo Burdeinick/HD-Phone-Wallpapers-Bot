@@ -37,8 +37,8 @@ class RequestsDb:
     def add_user_info(self, user_id: str) -> bool:
         """ """
         try:
-            request = f"""INSERT INTO user(user_id, status_start)
-                          VALUES({user_id}, 1)
+            request = f"""INSERT INTO user(user_id, status_start, status_take_iphone)
+                          VALUES({user_id}, 1, 0)
                        """
             self.conn.execute(request)
             self.conn.commit()
@@ -75,6 +75,20 @@ class RequestsDb:
         except Exception:
             super_logger.error('Error get_iphone_info', exc_info=True)     
 
+    def set_status_take_iphone(self, user_id) -> bool:
+        """ """
+        try:
+            request = f"""UPDATE user
+                          SET status_take_iphone = 1
+                          WHERE user_id = {user_id}
+                       """
+            self.conn.execute(request)
+            self.conn.commit()
+            return True
+
+        except Exception:
+            super_logger.error('Error', exc_info=True)
+            return False
 
 class Telegram:
     """ """
@@ -129,6 +143,7 @@ class HandlerReqDb:
     """ """
     def __init__(self):
         self.connect_db = ConnectionDB().conn
+        self.request_db = RequestsDb()
 
     def hand_iphone_info(self, iphone_info: list) -> list:
         """ """
@@ -141,3 +156,25 @@ class HandlerReqDb:
         
         except Exception:
             super_logger.error('Error hand_iphone_info', exc_info=True)
+
+    def user_exist(self, user_id: str) -> bool:
+        """ """
+        try:
+            user_info = self.request_db.get_user_info(user_id)
+            if user_info:
+                return True
+            return False
+
+        except Exception:
+            super_logger.error('Error user_exist', exc_info=True)
+            return False
+
+    def get_iphone_list(self) -> list:
+        """ """
+        try:
+            iphone_info = self.request_db.get_iphone_info()
+            iphone_list = [i[0] for i in iphone_info]
+            return iphone_list
+
+        except Exception:
+            super_logger.error('Error get_iphone_list', exc_info=True)
