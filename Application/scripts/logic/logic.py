@@ -104,7 +104,7 @@ class RequestsDb:
             return True
 
         except Exception:
-            super_logger.error('Error', exc_info=True)
+            super_logger.error('Error set_id_iphone', exc_info=True)
             return False
 
     def get_pixresolution(self, user_id: str):
@@ -121,6 +121,20 @@ class RequestsDb:
         except Exception:
             super_logger.error('Error get_iphone_info', exc_info=True)  
 
+
+    def del_user(self, user_id: str):
+        """ """
+        try:
+            request = f"""DELETE FROM user
+                          WHERE user_id = {user_id}
+                       """
+            self.conn.execute(request)
+            self.conn.commit()
+            return True
+
+        except Exception:
+            super_logger.error('Error del_user', exc_info=True)
+            return False
 
 
 class Telegram:
@@ -176,27 +190,17 @@ class Telegram:
         """ """
         try:
             all_pix = self.request_db.get_pixresolution(chat_id)
-            ferst_pix = all_pix[0][0]
-            second_pix = all_pix[0][1]
-
-            method = "sendPhoto"
-            url = f"https://api.telegram.org/bot{token}/{method}"
-            data = {"chat_id": chat_id, "photo": f"https://picsum.photos/{ferst_pix}/{second_pix}"}
-            requests.post(url, data=data)
+            if all_pix:
+                ferst_pix = all_pix[0][0].split(' ')[0]
+                second_pix = all_pix[0][0].split(' ')[1]
+                method = "sendPhoto"
+                url = f"https://api.telegram.org/bot{token}/{method}"
+                url_foto = requests.get(f"https://picsum.photos/{ferst_pix}/{second_pix}").url
+                data = {"chat_id": chat_id, "photo": url_foto}
+                requests.post(url, data=data)
 
         except Exception:
             super_logger.error('Error send_photo', exc_info=True) 
-
-
-
-
-
-
-
-
-
-
-
 
 
 class HandlerReqDb:

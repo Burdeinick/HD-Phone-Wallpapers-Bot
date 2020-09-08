@@ -42,8 +42,11 @@ def receive_update():
             user_exist = hand_req_db.user_exist(chat_id)
             stat_take_iphone = request_db.set_status_take_iphone(chat_id)
             if user_exist and stat_take_iphone:  # если пользователь есть в БД и он уже выбрал модель своего айфона
-                
                 teleg.send_photo(chat_id)
 
+        if text_message == '/stop':
+            del_user = request_db.del_user(chat_id)
+
+            
 
     return {"ok": True}
