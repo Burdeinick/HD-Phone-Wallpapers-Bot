@@ -107,6 +107,22 @@ class RequestsDb:
             super_logger.error('Error', exc_info=True)
             return False
 
+    def get_pixresolution(self, user_id: str):
+        """ """
+        try:
+            request = f"""SELECT val
+                            FROM pixresolution JOIN iphone USING(id_pixresolution)
+                            JOIN user USING(id_iphone)
+                            WHERE user_id = {user_id}
+                       """
+            self.cursor.execute(request)
+            return self.cursor.fetchall()
+
+        except Exception:
+            super_logger.error('Error get_iphone_info', exc_info=True)  
+
+
+
 class Telegram:
     """ """
     def __init__(self):
@@ -159,24 +175,18 @@ class Telegram:
     def send_photo(self, chat_id: str):
         """ """
         try:
+            all_pix = self.request_db.get_pixresolution(chat_id)
+            ferst_pix = all_pix[0][0]
+            second_pix = all_pix[0][1]
+
             method = "sendPhoto"
             url = f"https://api.telegram.org/bot{token}/{method}"
-            data = {"chat_id": chat_id, "photo": "https://picsum.photos/id/237/200/300"}
+            data = {"chat_id": chat_id, "photo": f"https://picsum.photos/{ferst_pix}/{second_pix}"}
             requests.post(url, data=data)
 
         except Exception:
             super_logger.error('Error send_photo', exc_info=True) 
 
-
-
-
-
-
-
-
-    def get_picture_req(self):
-        """ """
-        pass
 
 
 
@@ -229,7 +239,7 @@ class HandlerReqDb:
         except Exception:
             super_logger.error('Error get_iphone_list', exc_info=True)
 
-    def get_status_take_iphone(self, user_id: str ) -> bool:
+    def get_status_take_iphone(self, user_id: str) -> bool:
         """ """
         try:
             user_info = self.request_db.get_user_info(user_id)
