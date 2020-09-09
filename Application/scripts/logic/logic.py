@@ -172,7 +172,7 @@ class Telegram:
 
         except Exception:
             super_logger.error('Error get_picture', exc_info=True)
-
+    
     def button(self, title_button: list, user_id: str):
         """ """
         try:
@@ -255,3 +255,68 @@ class HandlerReqDb:
 
         except Exception:
             super_logger.error('Error get_status_take_iphone', exc_info=True)
+
+
+class HandlerServer:
+    """ """
+    def __init__(self, request_json):
+        self.request_db = RequestsDb()
+        self.hand_req_db = HandlerReqDb()
+        self.teleg = Telegram()
+        self.req = request_json
+        self.chat_id = self.req["message"]["chat"]["id"]
+        self.text_message = self.req['message']['text']
+
+        self.update_id = self.req["update_id"]
+
+    def start_command(self):
+        """ """
+        user_exist = self.hand_req_db.user_exist(self.chat_id)
+        if not user_exist:
+            add_user = self.request_db.add_user_info(self.chat_id)
+            if add_user:
+                self.teleg.select_iphone(self.chat_id)
+        else:
+            status_take_iphone = self.hand_req_db.get_status_take_iphone(self.chat_id)
+            if status_take_iphone:
+                self.teleg.get_picture(self.chat_id)
+            else:
+                self.teleg.select_iphone(self.chat_id)
+
+    def any_iphon_command(self):
+        """ """
+        user_exist = self.hand_req_db.user_exist(self.chat_id)
+        if user_exist:
+            stat_take_iphone = self.request_db.set_status_take_iphone(self.chat_id)
+            set_id_iphone = self.request_db.set_id_iphone(self.chat_id, self.text_message)  # пользователю присваивается id_iphone
+            if stat_take_iphone and set_id_iphone:
+                self.teleg.get_picture(self.chat_id)
+
+    def get_wallpapers_command(self):
+        """ """
+        user_exist = self.hand_req_db.user_exist(self.chat_id)
+        stat_take_iphone = self.request_db.set_status_take_iphone(self.chat_id)
+        if user_exist and stat_take_iphone:  # если пользователь есть в БД и он уже выбрал модель своего айфона
+            self.teleg.send_photo(self.chat_id)
+        
+    def stop_command(self):
+        """ """
+        del_user = self.request_db.del_user(self.chat_id)
+
+    def select_comand(self):
+        """ """
+        if self.text_message == "/start":
+            self.start_command()
+
+        if self.text_message in self.hand_req_db.get_iphone_list():
+            self.any_iphon_command()
+
+        if self.text_message == "Получить обои":
+            self.get_wallpapers_command()
+
+        if self.text_message == "/stop":
+            self.stop_command()
+
+
+
+
