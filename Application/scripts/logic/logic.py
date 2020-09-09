@@ -179,7 +179,7 @@ class Telegram:
             method = "sendMessage"
             url = f"https://api.telegram.org/bot{token}/{method}"
             reply = json.dumps({"keyboard": title_button, "resize_keyboard": True})
-            params = {"chat_id": user_id, "reply_markup": reply, "text": "Ok"}
+            params = {"chat_id": user_id, "reply_markup": reply, "text": "👌"}
             a = requests.post(url, params)
             print(a.content)
         
@@ -265,9 +265,7 @@ class HandlerServer:
         self.teleg = Telegram()
         self.req = request_json
         self.chat_id = self.req["message"]["chat"]["id"]
-        self.text_message = self.req['message']['text']
-
-        self.update_id = self.req["update_id"]
+        self.text_message = self.req['message']['text'] if 'text' in self.req['message'] else ''
 
     def start_command(self):
         """ """
@@ -316,7 +314,3 @@ class HandlerServer:
 
         if self.text_message == "/stop":
             self.stop_command()
-
-
-
-

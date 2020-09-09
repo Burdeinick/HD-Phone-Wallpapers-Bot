@@ -4,6 +4,8 @@ from scripts.logic.logic import RequestsDb
 from scripts.logic.logic import HandlerReqDb
 from scripts.logic.logic import HandlerServer as hand_serv
 
+import time
+
 
 app = Flask(__name__)
 teleg = Telegram()
