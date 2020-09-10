@@ -164,22 +164,31 @@ class Telegram:
         except Exception:
             super_logger.error('Error select_iphone', exc_info=True)
 
-    def get_picture(self, user_id):
+    def get_picture_chang_iph(self, user_id):
         """ """
         try:
-            title_button = [[{"text": "Получить обои"}]]
+            title_button = [[{"text": "Получить обои"}], [{"text": "Изменить модель iphone"}]]
             self.button(title_button, user_id)
 
         except Exception:
-            super_logger.error('Error get_picture', exc_info=True)
+            super_logger.error('Error get_picture_chang_iph', exc_info=True)
     
+    def get_start_butt(self, user_id):
+        """ """
+        try:
+            title_button = [[{"text": "Начать"}]]
+            self.button(title_button, user_id)
+
+        except Exception:
+            super_logger.error('Error get_picture_chang_iph', exc_info=True)
+
     def button(self, title_button: list, user_id: str):
         """ """
         try:
             method = "sendMessage"
             url = f"https://api.telegram.org/bot{token}/{method}"
             reply = json.dumps({"keyboard": title_button, "resize_keyboard": True})
-            params = {"chat_id": user_id, "reply_markup": reply, "text": "Ok"}
+            params = {"chat_id": user_id, "reply_markup": reply, "text": "👌"}
             a = requests.post(url, params)
             print(a.content)
         
@@ -191,6 +200,9 @@ class Telegram:
         try:
             all_pix = self.request_db.get_pixresolution(chat_id)
             if all_pix:
+
+                print(all_pix)
+
                 ferst_pix = all_pix[0][0].split(' ')[0]
                 second_pix = all_pix[0][0].split(' ')[1]
                 method = "sendPhoto"
@@ -265,7 +277,7 @@ class HandlerServer:
         self.teleg = Telegram()
         self.req = request_json
         self.chat_id = self.req["message"]["chat"]["id"]
-        self.text_message = self.req['message']['text']
+        self.text_message = self.req["message"]["text"] if "text" in self.req["message"] else ""
 
         self.update_id = self.req["update_id"]
 
@@ -279,7 +291,7 @@ class HandlerServer:
         else:
             status_take_iphone = self.hand_req_db.get_status_take_iphone(self.chat_id)
             if status_take_iphone:
-                self.teleg.get_picture(self.chat_id)
+                self.teleg.get_picture_chang_iph(self.chat_id)
             else:
                 self.teleg.select_iphone(self.chat_id)
 
@@ -290,18 +302,25 @@ class HandlerServer:
             stat_take_iphone = self.request_db.set_status_take_iphone(self.chat_id)
             set_id_iphone = self.request_db.set_id_iphone(self.chat_id, self.text_message)  # пользователю присваивается id_iphone
             if stat_take_iphone and set_id_iphone:
-                self.teleg.get_picture(self.chat_id)
+                self.teleg.get_picture_chang_iph(self.chat_id)
 
     def get_wallpapers_command(self):
         """ """
         user_exist = self.hand_req_db.user_exist(self.chat_id)
         stat_take_iphone = self.request_db.set_status_take_iphone(self.chat_id)
         if user_exist and stat_take_iphone:  # если пользователь есть в БД и он уже выбрал модель своего айфона
+            self.teleg.send_message(self.chat_id, "Секундочку, Ваши обои тоже ждут встречи с Вами \U0001f929")
             self.teleg.send_photo(self.chat_id)
-        
+
     def stop_command(self):
         """ """
         del_user = self.request_db.del_user(self.chat_id)
+        if del_user:
+            text = """Если Вы вновь захотите воспользоваться ботом, нажмите - "Начать" """
+            self.teleg.get_start_butt(self.chat_id)
+            self.teleg.send_message(self.chat_id, text)
+            
+
 
     def select_comand(self):
         """ """
@@ -314,9 +333,12 @@ class HandlerServer:
         if self.text_message == "Получить обои":
             self.get_wallpapers_command()
 
+        if self.text_message == "Изменить модель iphone":
+            self.teleg.select_iphone(self.chat_id)
+
+        if self.text_message == "Начать":
+            self.start_command()
+
         if self.text_message == "/stop":
             self.stop_command()
-
-
-
 
