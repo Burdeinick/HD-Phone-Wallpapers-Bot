@@ -277,13 +277,7 @@ class HandlerServer:
         self.teleg = Telegram()
         self.req = request_json
         self.chat_id = self.req["message"]["chat"]["id"]
-<<<<<<< HEAD
         self.text_message = self.req["message"]["text"] if "text" in self.req["message"] else ""
-
-        self.update_id = self.req["update_id"]
-=======
-        self.text_message = self.req['message']['text'] if 'text' in self.req['message'] else ''
->>>>>>> e6bf26ae77f4c5c08e625d7182a011ab0f3f4bd1
 
     def start_command(self):
         """ """
