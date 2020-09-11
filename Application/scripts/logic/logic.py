@@ -278,6 +278,8 @@ class HandlerServer:
         self.req = request_json
         self.chat_id = self.req["message"]["chat"]["id"]
         self.text_message = self.req["message"]["text"] if "text" in self.req["message"] else ""
+        self.select_comand()
+        print('!!!!!')
 
     def start_command(self):
         """ """
