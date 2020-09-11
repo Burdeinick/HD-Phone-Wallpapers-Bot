@@ -19,31 +19,34 @@ hand_req_db = HandlerReqDb()
 
 
 
+def dec_time(func):
+    def wrapper(request):
+        start_time = time.time()
+        respons = func(request)
+        print("--- %s seconds ---" % (time.time() - start_time))
+        return respons
+    return wrapper
 
+
+# @dec_time
 async def receive_update(request):
-    # print(await request.json())
-    # print("!")
-
-    # print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     # await asyncio.sleep(3)
+    # print(await request.json())
+    # start_time = time.time()
+    # print('Начал')
     # time.sleep(3)
+
+    # hand_serv(await request.json())
+    # print("--- %s seconds ---" % (time.time() - start_time))
     # print('Закончил')
-    # results = hand_serv(await request.json())
-    # results.select_comand()
-    
+
     async with aiohttp.ClientSession() as session:
-        
-        # start_time = time.time()
-
-        # print(await request.json())
-        # print('Начал')
+        start_time = time.time()
+        await asyncio.sleep(1)
         hand_serv(await request.json())
-        # results.select_comand()
-        # await asyncio.sleep(10)
-        # print('Закончил')
-        # print("--- %s seconds ---" % (time.time() - start_time))
+        print("--- %s seconds ---" % (time.time() - start_time))
 
-        # return web.json_response({'ok': True})
+        return web.json_response({'ok': True})
 
     return web.json_response({'ok': True})
 
