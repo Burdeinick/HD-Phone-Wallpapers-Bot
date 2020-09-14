@@ -43,7 +43,7 @@ class RequestsDb:
             return True
 
         except Exception:
-            super_logger.error('Error', exc_info=True)
+            super_logger.error('Error add_user_info', exc_info=True)
             return False
 
     def get_user_info(self, user_id: str) -> list:
@@ -57,7 +57,7 @@ class RequestsDb:
             return self.cursor.fetchall()
 
         except Exception:
-            super_logger.error('Error get_user_id', exc_info=True)
+            super_logger.error('Error get_user_info', exc_info=True)
 
     def get_iphone_info(self) -> list:
         """The function returns info list about 'iphone'."""
@@ -137,13 +137,13 @@ class RequestsDb:
 
 
 class Telegram:
-    """ """
+    """The class for work with Telegram API."""
     def __init__(self):
         self.request_db = RequestsDb()
         self.hand_req_db = HandlerReqDb()
 
     def send_message(self, chat_id, text):
-        """"""
+        """The function can send message necessary user."""
         try:
             method = "sendMessage"
             url = f"https://api.telegram.org/bot{token}/{method}"
@@ -154,7 +154,10 @@ class Telegram:
             super_logger.error('Error send_message', exc_info=True) 
 
     def select_iphone(self, user_id):
-        """"""
+        """The function can call function for send buttons to
+        user with all exists to DB of  iPhone model.
+
+        """
         try:
             get_info = self.request_db.get_iphone_info()
             lst_iphones = self.hand_req_db.hand_iphone_info(get_info)
@@ -164,7 +167,10 @@ class Telegram:
             super_logger.error('Error select_iphone', exc_info=True)
 
     def get_picture_chang_iph(self, user_id):
-        """ """
+        """The function can call function for send buttons
+        'Получить обои' and 'Изменить модель iphone'.
+
+        """
         try:
             title_button = [[{"text": "Получить обои"}], [{"text": "Изменить модель iphone"}]]
             self.button(title_button, user_id)
@@ -173,7 +179,7 @@ class Telegram:
             super_logger.error('Error get_picture_chang_iph', exc_info=True)
     
     def get_start_butt(self, user_id):
-        """ """
+        """The function can call function for send button 'Начать'."""
         try:
             title_button = [[{"text": "Начать"}]]
             self.button(title_button, user_id)
@@ -182,7 +188,7 @@ class Telegram:
             super_logger.error('Error get_picture_chang_iph', exc_info=True)
 
     def button(self, title_button: list, user_id: str):
-        """ """
+        """The function can do request to telegram API for send buttons user."""
         try:
             method = "sendMessage"
             url = f"https://api.telegram.org/bot{token}/{method}"
@@ -195,13 +201,10 @@ class Telegram:
             super_logger.error('Error button', exc_info=True)
 
     def send_photo(self, chat_id: str):
-        """ """
+        """The function can get photo of 'Picsum' API and send it to user."""
         try:
             all_pix = self.request_db.get_pixresolution(chat_id)
             if all_pix:
-
-                print(all_pix)
-
                 ferst_pix = all_pix[0][0].split(' ')[0]
                 second_pix = all_pix[0][0].split(' ')[1]
                 method = "sendPhoto"
