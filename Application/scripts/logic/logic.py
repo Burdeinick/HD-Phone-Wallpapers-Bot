@@ -33,7 +33,7 @@ class RequestsDb:
         self.cursor = ConnectionDB().cursor
 
     def add_user_info(self, user_id: str) -> bool:
-        """ """
+        """The function returns True if new user added to DB else returns False."""
         try:
             request = f"""INSERT INTO user(user_id, status_start, status_take_iphone)
                           VALUES({user_id}, 1, 0)
@@ -46,9 +46,8 @@ class RequestsDb:
             super_logger.error('Error', exc_info=True)
             return False
 
-
     def get_user_info(self, user_id: str) -> list:
-        """ """
+        """The function returns info about one user."""
         try:
             request = f"""SELECT user_id, id_iphone, status_start, status_take_iphone
                           FROM user
