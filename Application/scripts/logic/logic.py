@@ -60,7 +60,7 @@ class RequestsDb:
             super_logger.error('Error get_user_id', exc_info=True)
 
     def get_iphone_info(self) -> list:
-        """ """
+        """The function returns info list about 'iphone'."""
         try:
             request = f"""SELECT title, id_iphone
                           FROM iphone
@@ -73,7 +73,7 @@ class RequestsDb:
             super_logger.error('Error get_iphone_info', exc_info=True)     
 
     def set_status_take_iphone(self, user_id) -> bool:
-        """ """
+        """The function returns True if 'status_take_iphone' successfully set to True."""
         try:
             request = f"""UPDATE user
                           SET status_take_iphone = 1
@@ -87,8 +87,8 @@ class RequestsDb:
             super_logger.error('Error', exc_info=True)
             return False
 
-    def set_id_iphone(self, user_id: str, text_message: str):
-        """ """
+    def set_id_iphone(self, user_id: str, text_message: str) -> bool:
+        """The function returns True if request with SET 'id iphone' end successfully."""
         try:
             request = f"""UPDATE user
                           SET id_iphone = (
@@ -106,8 +106,8 @@ class RequestsDb:
             super_logger.error('Error set_id_iphone', exc_info=True)
             return False
 
-    def get_pixresolution(self, user_id: str):
-        """ """
+    def get_pixresolution(self, user_id: str) -> list:
+        """The function returns value resolution of need iphone model for it user."""
         try:
             request = f"""SELECT val
                             FROM pixresolution JOIN iphone USING(id_pixresolution)
@@ -121,8 +121,8 @@ class RequestsDb:
             super_logger.error('Error get_iphone_info', exc_info=True)  
 
 
-    def del_user(self, user_id: str):
-        """ """
+    def del_user(self, user_id: str) -> bool:
+        """The function returns True if user was successfully deleted of DB else False."""
         try:
             request = f"""DELETE FROM user
                           WHERE user_id = {user_id}
