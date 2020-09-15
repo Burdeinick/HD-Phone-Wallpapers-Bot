@@ -20,7 +20,15 @@ hand_req_db = HandlerReqDb()
 
 
 
+def dec_time(func):
+    def wrapper(request):
+        start_time = time.time()
+        respons = func(request)
+        print("--- %s seconds ---" % (time.time() - start_time))
+        return respons
+    return wrapper
 
+<<<<<<< HEAD
 async def receive_update(request):
     async with aiohttp.ClientSession() as session:
         print('Начал')
@@ -35,6 +43,28 @@ async def receive_update(request):
             stat_take_iphone = request_db.set_status_take_iphone(chat_id)
             if user_exist and stat_take_iphone:  # если пользователь есть в БД и он уже выбрал модель своего айфона
                 await teleg.send_message(chat_id, "Секундочку, Ваши обои тоже ждут встречи с Вами \U0001f929")
+=======
+
+# @dec_time
+async def receive_update(request):
+    # await asyncio.sleep(3)
+    # print(await request.json())
+    # start_time = time.time()
+    # print('Начал')
+    # time.sleep(3)
+
+    # hand_serv(await request.json())
+    # print("--- %s seconds ---" % (time.time() - start_time))
+    # print('Закончил')
+
+    async with aiohttp.ClientSession() as session:
+        start_time = time.time()
+        await asyncio.sleep(1)
+        hand_serv(await request.json())
+        print("--- %s seconds ---" % (time.time() - start_time))
+
+        return web.json_response({'ok': True})
+>>>>>>> 7ec1f836bd7a66dd9fccb9f11f5971946c2a22a2
 
                 all_pix = request_db.get_pixresolution(chat_id)
                 if all_pix:
