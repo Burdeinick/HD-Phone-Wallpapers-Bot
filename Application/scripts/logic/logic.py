@@ -154,7 +154,7 @@ class Telegram:
         except Exception:
             super_logger.error('Error send_message', exc_info=True) 
 
-    async def select_iphone(self, user_id):
+    def select_iphone(self, user_id):
         """"""
         try:
             get_info = self.request_db.get_iphone_info()
@@ -268,6 +268,25 @@ class HandlerReqDb:
         except Exception:
             super_logger.error('Error get_status_take_iphone', exc_info=True)
 
+    def hand_get_pixresolution(self, chat_id) -> tuple:
+        """ """
+        all_pix = self.request_db.get_pixresolution(chat_id)
+        if all_pix:
+            ferst_pix = all_pix[0][0].split(' ')[0]
+            second_pix = all_pix[0][0].split(' ')[1]
+
+            return (ferst_pix, second_pix)
+
+    async def chec_det_wal(self, text_message, chat_id):
+        """ """
+        if text_message == "Получить обои":
+            user_exist = self.user_exist(chat_id)
+            stat_take_iphone = self.request_db.set_status_take_iphone(chat_id)
+            if user_exist and stat_take_iphone:  # если пользователь есть в БД и он уже выбрал модель своего айфона
+                return True
+            return False 
+        return False 
+
 
 class HandlerServer:
     """ """
@@ -278,14 +297,6 @@ class HandlerServer:
         self.req = request_json
         self.chat_id = self.req["message"]["chat"]["id"]
         self.text_message = self.req["message"]["text"] if "text" in self.req["message"] else ""
-        print('!!!!!')
-        self.test_mes = self.for_send_mes()
-        # self.select_comand()
-
-
-
-
-
 
     def start_command(self):
         """ """
@@ -311,30 +322,23 @@ class HandlerServer:
                 self.teleg.get_picture_chang_iph(self.chat_id)
 
 
-################################################### Тест быстрой отправки сообщения о ожидании картинки
+# ################################################### Тест быстрой отправки сообщения о ожидании картинки
 
-    def for_send_mes(self):
-        try:
-            if self.text_message == "Получить обои":
-                user_exist = self.hand_req_db.user_exist(self.chat_id)
-                stat_take_iphone = self.request_db.set_status_take_iphone(self.chat_id)
-                if user_exist and stat_take_iphone:  # если пользователь есть в БД и он уже выбрал модель своего айфона
-                    self.teleg.send_message(self.chat_id, "Секундочку, Ваши обои тоже ждут встречи с Вами \U0001f929")
+#     def for_send_mes(self):
+#         try:
+#             if self.text_message == "Получить обои":
+#                 user_exist = self.hand_req_db.user_exist(self.chat_id)
+#                 stat_take_iphone = self.request_db.set_status_take_iphone(self.chat_id)
+#                 if user_exist and stat_take_iphone:  # если пользователь есть в БД и он уже выбрал модель своего айфона
+#                     self.teleg.send_message(self.chat_id, "Секундочку, Ваши обои тоже ждут встречи с Вами \U0001f929")
 
-                    return True
-                return False
+#                     return True
+#                 return False
 
-        except Exception:
-            super_logger.error('Error for_send_mes', exc_info=True)
-            return False
-##########################################################
-
-
-
-    async def get_wallpapers_command(self):
-        """ """
-        if self.test_mes:
-            self.teleg.send_photo(self.chat_id)
+#         except Exception:
+#             super_logger.error('Error for_send_mes', exc_info=True)
+#             return False
+# ##########################################################
 
     def stop_command(self):
         """ """
@@ -343,10 +347,9 @@ class HandlerServer:
             text = """Если Вы вновь захотите воспользоваться ботом, нажмите - "Начать" """
             self.teleg.get_start_butt(self.chat_id)
             self.teleg.send_message(self.chat_id, text)
-            
 
 
-    async def select_comand(self):
+    def select_comand(self):
         """ """
         if self.text_message == "/start":
             self.start_command()
@@ -354,8 +357,8 @@ class HandlerServer:
         if self.text_message in self.hand_req_db.get_iphone_list():
             self.any_iphon_command()
 
-        if self.text_message == "Получить обои":
-            await self.get_wallpapers_command()
+        # if self.text_message == "Получить обои":
+        #     self.get_wallpapers_command()
 
         if self.text_message == "Изменить модель iphone":
             self.teleg.select_iphone(self.chat_id)
