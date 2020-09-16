@@ -159,7 +159,7 @@ class Telegram:
         try:
             get_info = self.request_db.get_iphone_info()
             lst_iphones = self.hand_req_db.hand_iphone_info(get_info)
-            self.button(lst_iphones, user_id)
+            self.button(lst_iphones, user_id, text="Выберете модель Вашего iPhone 👇🏻")
 
         except Exception:
             super_logger.error('Error select_iphone', exc_info=True)
@@ -167,52 +167,32 @@ class Telegram:
     def get_picture_chang_iph(self, user_id):
         """ """
         try:
-            title_button = [[{"text": "Получить обои"}], [{"text": "Изменить модель iphone"}]]
-            self.button(title_button, user_id)
+            title_button = [[{"text": "Получить обои"}], [{"text": "Изменить модель iPhone"}]]
+            self.button(title_button, user_id, text="Отлично! Я запомнил данную модель 😎")
 
         except Exception:
             super_logger.error('Error get_picture_chang_iph', exc_info=True)
     
-    def get_start_butt(self, user_id):
+    def get_start_butt(self, user_id, text):
         """ """
         try:
             title_button = [[{"text": "Начать"}]]
-            self.button(title_button, user_id)
+            self.button(title_button, user_id, text)
 
         except Exception:
             super_logger.error('Error get_picture_chang_iph', exc_info=True)
 
-    def button(self, title_button: list, user_id: str):
+    def button(self, title_button: list, user_id: str, text="👌"):
         """ """
         try:
             method = "sendMessage"
             url = f"https://api.telegram.org/bot{token}/{method}"
             reply = json.dumps({"keyboard": title_button, "resize_keyboard": True})
-            params = {"chat_id": user_id, "reply_markup": reply, "text": "👌"}
-            a = requests.post(url, params)
-            print(a.content)
+            params = {"chat_id": user_id, "reply_markup": reply, "text": text}
+            requests.post(url, params)
         
         except Exception:
             super_logger.error('Error button', exc_info=True)
-
-    def send_photo(self, chat_id: str):
-        """ """
-        try:
-            all_pix = self.request_db.get_pixresolution(chat_id)
-            if all_pix:
-
-                print(all_pix)
-
-                ferst_pix = all_pix[0][0].split(' ')[0]
-                second_pix = all_pix[0][0].split(' ')[1]
-                method = "sendPhoto"
-                url = f"https://api.telegram.org/bot{token}/{method}"
-                url_foto = requests.get(f"https://picsum.photos/{ferst_pix}/{second_pix}").url
-                data = {"chat_id": chat_id, "photo": url_foto}
-                requests.post(url, data=data)
-
-        except Exception:
-            super_logger.error('Error send_photo', exc_info=True) 
 
 
 class HandlerReqDb:
@@ -268,7 +248,7 @@ class HandlerReqDb:
         except Exception:
             super_logger.error('Error get_status_take_iphone', exc_info=True)
 
-    def hand_get_pixresolution(self, chat_id) -> tuple:
+    async def hand_get_pixresolution(self, chat_id) -> tuple:
         """ """
         all_pix = self.request_db.get_pixresolution(chat_id)
         if all_pix:
@@ -276,16 +256,6 @@ class HandlerReqDb:
             second_pix = all_pix[0][0].split(' ')[1]
 
             return (ferst_pix, second_pix)
-
-    async def chec_det_wal(self, text_message, chat_id):
-        """ """
-        if text_message == "Получить обои":
-            user_exist = self.user_exist(chat_id)
-            stat_take_iphone = self.request_db.set_status_take_iphone(chat_id)
-            if user_exist and stat_take_iphone:  # если пользователь есть в БД и он уже выбрал модель своего айфона
-                return True
-            return False 
-        return False 
 
 
 class HandlerServer:
@@ -321,35 +291,24 @@ class HandlerServer:
             if stat_take_iphone and set_id_iphone:
                 self.teleg.get_picture_chang_iph(self.chat_id)
 
-
-# ################################################### Тест быстрой отправки сообщения о ожидании картинки
-
-#     def for_send_mes(self):
-#         try:
-#             if self.text_message == "Получить обои":
-#                 user_exist = self.hand_req_db.user_exist(self.chat_id)
-#                 stat_take_iphone = self.request_db.set_status_take_iphone(self.chat_id)
-#                 if user_exist and stat_take_iphone:  # если пользователь есть в БД и он уже выбрал модель своего айфона
-#                     self.teleg.send_message(self.chat_id, "Секундочку, Ваши обои тоже ждут встречи с Вами \U0001f929")
-
-#                     return True
-#                 return False
-
-#         except Exception:
-#             super_logger.error('Error for_send_mes', exc_info=True)
-#             return False
-# ##########################################################
-
     def stop_command(self):
         """ """
+        print("vvvvvvvvvvvvvvvvvvvvvvv")
         del_user = self.request_db.del_user(self.chat_id)
         if del_user:
-            text = """Если Вы вновь захотите воспользоваться ботом, нажмите - "Начать" """
-            self.teleg.get_start_butt(self.chat_id)
-            self.teleg.send_message(self.chat_id, text)
+            text = """Если Вы вновь захотите воспользоваться ботом, нажмите - "Начать" 👇🏻"""
+            self.teleg.get_start_butt(self.chat_id, text)
+            # self.teleg.send_message(self.chat_id, text)
 
+    async def chec_det_wal(self, text_message, chat_id):
+        if text_message == "Получить обои":
+            user_exist = self.hand_req_db.user_exist(chat_id)
+            stat_take_iphone = self.request_db.set_status_take_iphone(chat_id)
+            if user_exist and stat_take_iphone:  # если пользователь есть в БД и он уже выбрал модель своего айфона
+                return True
+            return False 
 
-    def select_comand(self):
+    async def select_comand(self):
         """ """
         if self.text_message == "/start":
             self.start_command()
@@ -357,10 +316,7 @@ class HandlerServer:
         if self.text_message in self.hand_req_db.get_iphone_list():
             self.any_iphon_command()
 
-        # if self.text_message == "Получить обои":
-        #     self.get_wallpapers_command()
-
-        if self.text_message == "Изменить модель iphone":
+        if self.text_message == "Изменить модель iPhone":
             self.teleg.select_iphone(self.chat_id)
 
         if self.text_message == "Начать":
@@ -368,4 +324,5 @@ class HandlerServer:
 
         if self.text_message == "/stop":
             self.stop_command()
+
 
