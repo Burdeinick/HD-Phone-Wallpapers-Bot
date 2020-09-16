@@ -277,7 +277,10 @@ class HandlerReqDb:
 
 
 class HandlerServer:
-    """ """
+    """The class can to process requests
+    regarding the text that is written in them.
+    
+    """
     def __init__(self, request_json):
         self.request_db = RequestsDb()
         self.hand_req_db = HandlerReqDb()
@@ -296,7 +299,6 @@ class HandlerServer:
         else:
             status_take_iphone = self.hand_req_db.get_status_take_iphone(self.chat_id)
             if status_take_iphone:
-
                 self.teleg.get_picture_chang_iph(self.chat_id, text="Вы уже запустили бота 👌")
             else:
                 self.teleg.select_iphone(self.chat_id)
