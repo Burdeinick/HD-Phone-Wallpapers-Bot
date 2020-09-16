@@ -1,9 +1,12 @@
 import json
 from server_bot import app
+from server_bot import receive_update
+from aiohttp import web
 
 
 def main():
-    app.run(*get_config(),debug=True)
+    app.router.add_route("POST", "/", receive_update)
+    web.run_app(app)
 
 def get_config():
     with open('Application/config.json') as config:

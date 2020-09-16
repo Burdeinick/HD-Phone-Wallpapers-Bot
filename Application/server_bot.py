@@ -1,24 +1,41 @@
-from flask import Flask, make_response, request
 from scripts.logic.logic import Telegram
 from scripts.logic.logic import RequestsDb
 from scripts.logic.logic import HandlerReqDb
-from scripts.logic.logic import HandlerServer as hand_serv
-
+from scripts.logic.logic import HandlerServer
+from TOKEN import token
 import time
+import asyncio
+import aiohttp
+from aiohttp import web, request
 
 
-app = Flask(__name__)
+app = web.Application()
 teleg = Telegram()
 request_db = RequestsDb()
 hand_req_db = HandlerReqDb()
+hand_serv = HandlerServer
 
 
+async def receive_update(request):
+    async with aiohttp.ClientSession() as session:
+        print('Начал')
+        start_time = time.time()
+        req = await request.json()
+        h_s = hand_serv(req)
+        chat_id = h_s.chat_id
+        text_message = h_s.text_message
+        chec_det_wal = h_s.chec_det_wal(text_message, chat_id)
 
-@app.route("/", methods=["GET", "POST"])
-def receive_update():
-    if request.method == "POST":
-        print(request.json)
-        a = hand_serv(request.json)
-        a.select_comand()
+        if await chec_det_wal:
+            await teleg.send_message(chat_id, "Секундочку, Ваши обои уже ждут встречи с Вами \U0001f929")
+            pix = await hand_req_db.hand_get_pixresolution(chat_id)
+            async with session.get(f"https://picsum.photos/{pix[0]}/{pix[1]}") as ses_get:
+                url_foto = str(ses_get.url)
+                method = "sendPhoto"
+                data = {"chat_id": chat_id, "photo": url_foto}
+                await session.post(f"https://api.telegram.org/bot{token}/{method}", data=data)
+        else:
+            await h_s.select_comand()
 
-    return {"ok": True}
+    print("---Закончил. %s seconds ---" % (time.time() - start_time))
+    return web.json_response({'ok': True})
