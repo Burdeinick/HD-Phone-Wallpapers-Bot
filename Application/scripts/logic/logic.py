@@ -201,13 +201,20 @@ class Telegram:
 
 
 class HandlerReqDb:
-    """ """
+    """The class can to do requests to DB and  handle responses."""
     def __init__(self):
+        """The method creates instances of classes
+        'ConnectionDB().conn' and 'RequestsDb()' for further use.
+        
+        """
         self.connect_db = ConnectionDB().conn
         self.request_db = RequestsDb()
 
     def hand_iphone_info(self, iphone_info: list) -> list:
-        """ """
+        """The function folds all  the models iphone
+        of DB and send их for display in Telegram.
+        
+        """
         try:
             buttons_lst = []
             for i in iphone_info:
@@ -219,7 +226,7 @@ class HandlerReqDb:
             super_logger.error('Error hand_iphone_info', exc_info=True)
 
     def user_exist(self, user_id: str) -> bool:
-        """ """
+        """The function return 'True' if user exist to DB."""
         try:
             user_info = self.request_db.get_user_info(user_id)
             if user_info:
@@ -231,7 +238,7 @@ class HandlerReqDb:
             return False
 
     def get_iphone_list(self) -> list:
-        """ """
+        """The function return list of title iPhone model."""
         try:
             iphone_info = self.request_db.get_iphone_info()
             iphone_list = [i[0] for i in iphone_info]
@@ -241,7 +248,10 @@ class HandlerReqDb:
             super_logger.error('Error get_iphone_list', exc_info=True)
 
     def get_status_take_iphone(self, user_id: str) -> bool:
-        """ """
+        """The function return 'True' if
+        'status_take_iphone' of 'user' table == 1.
+
+        """
         try:
             user_info = self.request_db.get_user_info(user_id)
             if user_info:
@@ -254,7 +264,10 @@ class HandlerReqDb:
             super_logger.error('Error get_status_take_iphone', exc_info=True)
 
     async def hand_get_pixresolution(self, chat_id) -> tuple:
-        """ """
+        """The function parses resolution of
+        iPhone and return tuple with two values resolution.
+        
+        """
         all_pix = self.request_db.get_pixresolution(chat_id)
         if all_pix:
             ferst_pix = all_pix[0][0].split(' ')[0]
@@ -289,7 +302,8 @@ class HandlerServer:
                 self.teleg.select_iphone(self.chat_id)
 
     def any_iphon_command(self):
-        """ """
+        """
+        """
         user_exist = self.hand_req_db.user_exist(self.chat_id)
         if user_exist:
             stat_take_iphone = self.request_db.set_status_take_iphone(self.chat_id)
