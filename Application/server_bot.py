@@ -29,7 +29,6 @@ async def receive_update(request):
         if await chec_det_wal:
             await teleg.send_message(chat_id, "Секундочку, Ваши обои уже ждут встречи с Вами \U0001f929")
             pix = await hand_req_db.hand_get_pixresolution(chat_id)
-
             async with session.get(f"https://picsum.photos/{pix[0]}/{pix[1]}") as ses_get:
                 url_foto = str(ses_get.url)
                 method = "sendPhoto"

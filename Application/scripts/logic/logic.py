@@ -278,6 +278,7 @@ class HandlerServer:
         else:
             status_take_iphone = self.hand_req_db.get_status_take_iphone(self.chat_id)
             if status_take_iphone:
+
                 self.teleg.get_picture_chang_iph(self.chat_id)
             else:
                 self.teleg.select_iphone(self.chat_id)
@@ -293,12 +294,10 @@ class HandlerServer:
 
     def stop_command(self):
         """ """
-        print("vvvvvvvvvvvvvvvvvvvvvvv")
         del_user = self.request_db.del_user(self.chat_id)
         if del_user:
             text = """Если Вы вновь захотите воспользоваться ботом, нажмите - "Начать" 👇🏻"""
             self.teleg.get_start_butt(self.chat_id, text)
-            # self.teleg.send_message(self.chat_id, text)
 
     async def chec_det_wal(self, text_message, chat_id):
         if text_message == "Получить обои":
@@ -310,7 +309,7 @@ class HandlerServer:
 
     async def select_comand(self):
         """ """
-        if self.text_message == "/start":
+        if self.text_message == "/start" or self.text_message == "Начать":
             self.start_command()
 
         if self.text_message in self.hand_req_db.get_iphone_list():
@@ -319,10 +318,5 @@ class HandlerServer:
         if self.text_message == "Изменить модель iPhone":
             self.teleg.select_iphone(self.chat_id)
 
-        if self.text_message == "Начать":
-            self.start_command()
-
         if self.text_message == "/stop":
             self.stop_command()
-
-
