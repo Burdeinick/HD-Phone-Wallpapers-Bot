@@ -142,13 +142,8 @@ class Telegram:
         self.request_db = RequestsDb()
         self.hand_req_db = HandlerReqDb()
 
-<<<<<<< HEAD
-    def send_message(self, chat_id, text):
-        """The function can send message necessary user."""
-=======
     async def send_message(self, chat_id, text):
-        """"""
->>>>>>> iohttp
+        """The function can send message necessary user."""
         try:
             method = "sendMessage"
             url = f"https://api.telegram.org/bot{token}/{method}"
@@ -171,25 +166,20 @@ class Telegram:
         except Exception:
             super_logger.error('Error select_iphone', exc_info=True)
 
-    def get_picture_chang_iph(self, user_id):
+    def get_picture_chang_iph(self, user_id, text="Отлично! Я запомнил данную модель 😎"):
         """The function can call function for send buttons
         'Получить обои' and 'Изменить модель iphone'.
 
         """
         try:
             title_button = [[{"text": "Получить обои"}], [{"text": "Изменить модель iPhone"}]]
-            self.button(title_button, user_id, text="Отлично! Я запомнил данную модель 😎")
+            self.button(title_button, user_id, text)
 
         except Exception:
             super_logger.error('Error get_picture_chang_iph', exc_info=True)
     
-<<<<<<< HEAD
-    def get_start_butt(self, user_id):
-        """The function can call function for send button 'Начать'."""
-=======
     def get_start_butt(self, user_id, text):
-        """ """
->>>>>>> iohttp
+        """The function can call function for send button 'Начать'."""
         try:
             title_button = [[{"text": "Начать"}]]
             self.button(title_button, user_id, text)
@@ -197,13 +187,8 @@ class Telegram:
         except Exception:
             super_logger.error('Error get_picture_chang_iph', exc_info=True)
 
-<<<<<<< HEAD
-    def button(self, title_button: list, user_id: str):
-        """The function can do request to telegram API for send buttons user."""
-=======
     def button(self, title_button: list, user_id: str, text="👌"):
-        """ """
->>>>>>> iohttp
+        """The function can do request to telegram API for send buttons user."""
         try:
             method = "sendMessage"
             url = f"https://api.telegram.org/bot{token}/{method}"
@@ -214,25 +199,6 @@ class Telegram:
         except Exception:
             super_logger.error('Error button', exc_info=True)
 
-<<<<<<< HEAD
-    def send_photo(self, chat_id: str):
-        """The function can get photo of 'Picsum' API and send it to user."""
-        try:
-            all_pix = self.request_db.get_pixresolution(chat_id)
-            if all_pix:
-                ferst_pix = all_pix[0][0].split(' ')[0]
-                second_pix = all_pix[0][0].split(' ')[1]
-                method = "sendPhoto"
-                url = f"https://api.telegram.org/bot{token}/{method}"
-                url_foto = requests.get(f"https://picsum.photos/{ferst_pix}/{second_pix}").url
-                data = {"chat_id": chat_id, "photo": url_foto}
-                requests.post(url, data=data)
-
-        except Exception:
-            super_logger.error('Error send_photo', exc_info=True) 
-
-=======
->>>>>>> iohttp
 
 class HandlerReqDb:
     """ """
@@ -318,7 +284,7 @@ class HandlerServer:
             status_take_iphone = self.hand_req_db.get_status_take_iphone(self.chat_id)
             if status_take_iphone:
 
-                self.teleg.get_picture_chang_iph(self.chat_id)
+                self.teleg.get_picture_chang_iph(self.chat_id, text="Вы уже запустили бота 👌")
             else:
                 self.teleg.select_iphone(self.chat_id)
 
@@ -329,7 +295,7 @@ class HandlerServer:
             stat_take_iphone = self.request_db.set_status_take_iphone(self.chat_id)
             set_id_iphone = self.request_db.set_id_iphone(self.chat_id, self.text_message)  # пользователю присваивается id_iphone
             if stat_take_iphone and set_id_iphone:
-                self.teleg.get_picture_chang_iph(self.chat_id)
+                self.teleg.get_picture_chang_iph(self.chat_id, text="Модель iPhone успешно выбранна 👌")
 
     def stop_command(self):
         """ """
