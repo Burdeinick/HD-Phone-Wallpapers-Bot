@@ -4,10 +4,6 @@ from server_bot import receive_update
 from aiohttp import web
 
 
-def main():
-    app.router.add_route("POST", "/", receive_update)
-    web.run_app(app)
-
 def get_config():
     with open('Application/config.json') as config:
         json_str = config.read()
@@ -16,6 +12,14 @@ def get_config():
     host = json_str['server']['host']
     port = json_str['server']['port']
     return (host, port)
+
+
+host, port = get_config()
+
+
+def main():
+    app.router.add_route("POST", "/", receive_update)
+    web.run_app(app, host=host, port=port)
 
 
 if __name__ == "__main__":

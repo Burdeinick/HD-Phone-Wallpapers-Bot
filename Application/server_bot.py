@@ -24,12 +24,15 @@ async def receive_update(request):
         h_s = hand_serv(req)
         chat_id = h_s.chat_id
         text_message = h_s.text_message
-        chec_det_wal = h_s.chec_det_wal(text_message, chat_id)
+        chec_det_wal = await h_s.chec_det_wal(text_message, chat_id)
 
-        if await chec_det_wal:
-            await teleg.send_message(chat_id, "Секундочку, Ваши обои уже ждут встречи с Вами \U0001f929")
+        if chec_det_wal:
+            text = "Секундочку, Ваши обои уже ждут встречи с Вами \U0001f929"
+            await teleg.send_message(chat_id, text)
             pix = await hand_req_db.hand_get_pixresolution(chat_id)
-            async with session.get(f"https://picsum.photos/{pix[0]}/{pix[1]}") as ses_get:
+            pix_1, pix_2 = pix[0], pix[1]
+            
+            async with session.get(f"https://picsum.photos/{pix_1}/{pix_2}") as ses_get:
                 url_foto = str(ses_get.url)
                 method = "sendPhoto"
                 data = {"chat_id": chat_id, "photo": url_foto}

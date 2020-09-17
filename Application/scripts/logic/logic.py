@@ -272,7 +272,6 @@ class HandlerReqDb:
         if all_pix:
             ferst_pix = all_pix[0][0].split(' ')[0]
             second_pix = all_pix[0][0].split(' ')[1]
-
             return (ferst_pix, second_pix)
 
 
@@ -282,15 +281,20 @@ class HandlerServer:
     
     """
     def __init__(self, request_json):
+        """This constructor creates instances classes
+        "RequestsDb()", "HandlerReqDb()",
+        "Telegram()" for further use and
+        parsers request_json at  text_message, chat_id.
+
+        """
         self.request_db = RequestsDb()
         self.hand_req_db = HandlerReqDb()
         self.teleg = Telegram()
-        self.req = request_json
-        self.chat_id = self.req["message"]["chat"]["id"]
-        self.text_message = self.req["message"]["text"] if "text" in self.req["message"] else ""
+        self.chat_id = request_json["message"]["chat"]["id"]
+        self.text_message = request_json["message"]["text"] if "text" in request_json["message"] else ""
 
     def start_command(self):
-        """ """
+        """The function run when getting "/start" command or "начать"."""
         user_exist = self.hand_req_db.user_exist(self.chat_id)
         if not user_exist:
             add_user = self.request_db.add_user_info(self.chat_id)
@@ -304,8 +308,7 @@ class HandlerServer:
                 self.teleg.select_iphone(self.chat_id)
 
     def any_iphon_command(self):
-        """
-        """
+        """The function run when getting  commands any name iphone из DB."""
         user_exist = self.hand_req_db.user_exist(self.chat_id)
         if user_exist:
             stat_take_iphone = self.request_db.set_status_take_iphone(self.chat_id)
@@ -314,13 +317,14 @@ class HandlerServer:
                 self.teleg.get_picture_chang_iph(self.chat_id, text="Модель iPhone успешно выбранна 👌")
 
     def stop_command(self):
-        """ """
+        """The function run when getting "/stop" command."""
         del_user = self.request_db.del_user(self.chat_id)
         if del_user:
             text = """Если Вы вновь захотите воспользоваться ботом, нажмите - "Начать" 👇🏻"""
             self.teleg.get_start_butt(self.chat_id, text)
 
     async def chec_det_wal(self, text_message, chat_id):
+        """The function run when getting "Получить обои" command."""
         if text_message == "Получить обои":
             user_exist = self.hand_req_db.user_exist(chat_id)
             stat_take_iphone = self.request_db.set_status_take_iphone(chat_id)
@@ -328,8 +332,8 @@ class HandlerServer:
                 return True
             return False 
 
-    async def select_comand(self):
-        """ """
+    async def select_comand(self):  
+        """The function chooses regarding "text_message" that do further."""
         if self.text_message == "/start" or self.text_message == "Начать":
             self.start_command()
 
