@@ -135,16 +135,15 @@ class RequestsDb:
             super_logger.error('Error del_user', exc_info=True)
             return False
 
+    def get_all_users(self) -> list:
+        """The function returns return list with number of users."""
+        try:
+            request = f"""SELECT COUNT(*) FROM user"""
+            self.cursor.execute(request)
+            return self.cursor.fetchall()
 
-    # def get_all_users(self) -> list:
-    #     """The function returns return list with number of users."""
-    #     try:
-    #         request = f"""SELECT COUNT(*) FROM user"""
-    #         self.cursor.execute(request)
-    #         return self.cursor.fetchall()
-
-    #     except Exception:
-    #         super_logger.error('Error get_all_users', exc_info=True)         
+        except Exception:
+            super_logger.error('Error get_all_users', exc_info=True)
 
 
 class Telegram:
@@ -314,7 +313,8 @@ class HandlerServer:
         else:
             status_take_iphone = self.hand_req_db.get_status_take_iphone(self.chat_id)
             if status_take_iphone:
-                self.teleg.get_picture_chang_iph(self.chat_id, text="Вы уже запустили бота 👌")
+                text = "Вы уже запустили бота 👌"
+                self.teleg.get_picture_chang_iph(self.chat_id, text=text)
             else:
                 self.teleg.select_iphone(self.chat_id)
 
@@ -325,7 +325,8 @@ class HandlerServer:
             stat_take_iphone = self.request_db.set_status_take_iphone(self.chat_id)
             set_id_iphone = self.request_db.set_id_iphone(self.chat_id, self.text_message)  # пользователю присваивается id_iphone
             if stat_take_iphone and set_id_iphone:
-                self.teleg.get_picture_chang_iph(self.chat_id, text="Модель iPhone успешно выбранна 👌")
+                text = "Модель iPhone успешно выбранна 👌"
+                self.teleg.get_picture_chang_iph(self.chat_id, text=text)
 
     def stop_command(self):
         """The function run when getting "/stop" command."""
@@ -343,16 +344,13 @@ class HandlerServer:
                 return True
             return False
     
-    # def my_users(self, chat_id):
-    #     """The function return ..."""
-    #     user_exist = self.hand_req_db.user_exist(self.chat_id)
-    #     if user_exist:
-    #         numb_users = self.request_db.get_all_users()[0]
-    #         self.teleg.send_message(chat_id, text=f"Количество пользователей бота: {numb_users}")
-
-
-
-
+    async def my_users(self, chat_id):
+        """The function call function of sending messages to user."""
+        user_exist = self.hand_req_db.user_exist(self.chat_id)
+        if user_exist:
+            numb_users = self.request_db.get_all_users()[0][0]
+            text = f"Количество пользователей бота: {numb_users}"
+            await self.teleg.send_message(chat_id, text=text)
 
     async def select_comand(self):  
         """The function chooses regarding "text_message" that do further."""
@@ -368,5 +366,5 @@ class HandlerServer:
         if self.text_message == "/stop":
             self.stop_command()
 
-        # if self.text_message == "/мои пользователи":
-        #     self.my_users(self.chat_id)
+        if self.text_message == "/users":
+            await self.my_users(self.chat_id)
