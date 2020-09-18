@@ -2,11 +2,18 @@ import json
 import sqlite3
 import requests
 from logger.log import MyLogging
-from TOKEN import token
+from TOKEN import token, my_chat_id
 
 
-super_logger = MyLogging().setup_logger('preparing_db_logger',
+super_logger = MyLogging().setup_logger('logic',
                                         'Application/logger/logfile.log')
+
+
+def get_logfile_inf():
+    """ """
+    with open("Application/logger/logfile.log", "r") as f:
+        errors = f.read()
+        return errors
 
 
 class ConnectionDB:
