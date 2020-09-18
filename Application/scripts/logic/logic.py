@@ -278,12 +278,15 @@ class HandlerReqDb:
         iPhone and return tuple with two values resolution.
         
         """
-        all_pix = self.request_db.get_pixresolution(chat_id)
-        if all_pix:
-            ferst_pix = all_pix[0][0].split(' ')[0]
-            second_pix = all_pix[0][0].split(' ')[1]
-            return (ferst_pix, second_pix)
+        try:
+            all_pix = self.request_db.get_pixresolution(chat_id)
+            if all_pix:
+                ferst_pix = all_pix[0][0].split(' ')[0]
+                second_pix = all_pix[0][0].split(' ')[1]
+                return (ferst_pix, second_pix)
 
+        except Exception:
+            super_logger.error('Error hand_get_pixresolution', exc_info=True)
 
 class HandlerServer:
     """The class can to process requests
@@ -305,66 +308,90 @@ class HandlerServer:
 
     def start_command(self):
         """The function run when getting "/start" command or "начать"."""
-        user_exist = self.hand_req_db.user_exist(self.chat_id)
-        if not user_exist:
-            add_user = self.request_db.add_user_info(self.chat_id)
-            if add_user:
-                self.teleg.select_iphone(self.chat_id)
-        else:
-            status_take_iphone = self.hand_req_db.get_status_take_iphone(self.chat_id)
-            if status_take_iphone:
-                text = "Вы уже запустили бота 👌"
-                self.teleg.get_picture_chang_iph(self.chat_id, text=text)
+        try:
+            user_exist = self.hand_req_db.user_exist(self.chat_id)
+            if not user_exist:
+                add_user = self.request_db.add_user_info(self.chat_id)
+                if add_user:
+                    self.teleg.select_iphone(self.chat_id)
             else:
-                self.teleg.select_iphone(self.chat_id)
+                status_take_iphone = self.hand_req_db.get_status_take_iphone(self.chat_id)
+                if status_take_iphone:
+                    text = "Вы уже запустили бота 👌"
+                    self.teleg.get_picture_chang_iph(self.chat_id, text=text)
+                else:
+                    self.teleg.select_iphone(self.chat_id)
+
+        except Exception:
+            super_logger.error('Error start_command', exc_info=True)
 
     def any_iphon_command(self):
         """The function run when getting  commands any name iphone из DB."""
-        user_exist = self.hand_req_db.user_exist(self.chat_id)
-        if user_exist:
-            stat_take_iphone = self.request_db.set_status_take_iphone(self.chat_id)
-            set_id_iphone = self.request_db.set_id_iphone(self.chat_id, self.text_message)  # пользователю присваивается id_iphone
-            if stat_take_iphone and set_id_iphone:
-                text = "Модель iPhone успешно выбранна 👌"
-                self.teleg.get_picture_chang_iph(self.chat_id, text=text)
+        try:
+            user_exist = self.hand_req_db.user_exist(self.chat_id)
+            if user_exist:
+                stat_take_iphone = self.request_db.set_status_take_iphone(self.chat_id)
+                set_id_iphone = self.request_db.set_id_iphone(self.chat_id, self.text_message)  # пользователю присваивается id_iphone
+                if stat_take_iphone and set_id_iphone:
+                    text = "Модель iPhone успешно выбранна 👌"
+                    self.teleg.get_picture_chang_iph(self.chat_id, text=text)
+
+        except Exception:
+            super_logger.error('Error any_iphon_command', exc_info=True)
 
     def stop_command(self):
         """The function run when getting "/stop" command."""
-        del_user = self.request_db.del_user(self.chat_id)
-        if del_user:
-            text = """Если Вы вновь захотите воспользоваться ботом, нажмите - "Начать" 👇🏻"""
-            self.teleg.get_start_butt(self.chat_id, text)
+        try:
+            del_user = self.request_db.del_user(self.chat_id)
+            if del_user:
+                text = """Если Вы вновь захотите воспользоваться ботом, нажмите - "Начать" 👇🏻"""
+                self.teleg.get_start_butt(self.chat_id, text)
+
+        except Exception:
+            super_logger.error('Error stop_command', exc_info=True)
 
     async def chec_det_wal(self, text_message, chat_id):
         """The function run when getting "Получить обои" command."""
-        if text_message == "Получить обои":
-            user_exist = self.hand_req_db.user_exist(chat_id)
-            stat_take_iphone = self.request_db.set_status_take_iphone(chat_id)
-            if user_exist and stat_take_iphone:  # если пользователь есть в БД и он уже выбрал модель своего айфона
-                return True
-            return False
+        try:
+            if text_message == "Получить обои":
+                user_exist = self.hand_req_db.user_exist(chat_id)
+                stat_take_iphone = self.request_db.set_status_take_iphone(chat_id)
+                if user_exist and stat_take_iphone:  # если пользователь есть в БД и он уже выбрал модель своего айфона
+                    return True
+                return False
+
+        except Exception:
+            super_logger.error('Error chec_det_wal', exc_info=True)
     
     async def my_users(self, chat_id):
         """The function call function of sending messages to user."""
-        user_exist = self.hand_req_db.user_exist(self.chat_id)
-        if user_exist:
-            numb_users = self.request_db.get_all_users()[0][0]
-            text = f"Количество пользователей бота: {numb_users}"
-            await self.teleg.send_message(chat_id, text=text)
+        try:
+            user_exist = self.hand_req_db.user_exist(self.chat_id)
+            if user_exist:
+                numb_users = self.request_db.get_all_users()[0][0]
+                text = f"Количество пользователей бота: {numb_users}"
+                await self.teleg.send_message(chat_id, text=text)
+
+        except Exception:
+            super_logger.error('Error my_users', exc_info=True)
 
     async def select_comand(self):  
         """The function chooses regarding "text_message" that do further."""
-        if self.text_message == "/start" or self.text_message == "Начать":
-            self.start_command()
+        try:
+            if self.text_message == "/start" or self.text_message == "Начать":
+                self.start_command()
 
-        if self.text_message in self.hand_req_db.get_iphone_list():
-            self.any_iphon_command()
+            if self.text_message in self.hand_req_db.get_iphone_list():
+                self.any_iphon_command()
 
-        if self.text_message == "Изменить модель iPhone":
-            self.teleg.select_iphone(self.chat_id)
+            if self.text_message == "Изменить модель iPhone":
+                self.teleg.select_iphone(self.chat_id)
 
-        if self.text_message == "/stop":
-            self.stop_command()
+            if self.text_message == "/stop":
+                self.stop_command()
 
-        if self.text_message == "/users":
-            await self.my_users(self.chat_id)
+            if self.text_message == "/users":
+                await self.my_users(self.chat_id)
+
+        except Exception:
+            super_logger.error('Error select_comand', exc_info=True)
