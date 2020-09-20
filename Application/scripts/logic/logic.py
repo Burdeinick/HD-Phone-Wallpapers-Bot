@@ -407,8 +407,8 @@ class HandlerServer:
         try:
             del_user = self.request_db.del_user(self.chat_id)
             if del_user:
-                text = f"""Если Вы вновь захотите воспользоваться ботом,
-                           нажмите - "Начать" 👇🏻"""
+                text = """Если Вы вновь захотите воспользоваться ботом,   \
+                        нажмите - "Начать" 👇🏻"""
                 self.teleg.get_start_butt(self.chat_id, text)
 
         except Exception:
