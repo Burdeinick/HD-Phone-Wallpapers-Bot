@@ -36,7 +36,6 @@ class DropTableDb:
         except Exception:
             super_logger.error('Error drop_iphone', exc_info=True)
 
-
     def drop_user(self):
         """Request to drop the 'user' table."""
         try:

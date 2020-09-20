@@ -35,7 +35,7 @@ class PreparDb:
                 self.connect_db.execute(request)
                 self.connect_db.commit()
         except Exception:
-            super_logger.error('Error create_pixresolution', exc_info=True)       
+            super_logger.error('Error create_pixresolution', exc_info=True)
 
     def create_iphone(self):
         """This method creates the 'iphone' table."""
@@ -54,7 +54,7 @@ class PreparDb:
                 self.connect_db.execute(request)
                 self.connect_db.commit()
         except Exception:
-            super_logger.error('Error create_iphone', exc_info=True) 
+            super_logger.error('Error create_iphone', exc_info=True)
 
     def create_user(self):
         """This method creates the 'user' table."""
@@ -132,6 +132,7 @@ def main():
     db.create_user()
     db.add_pixresolution()
     db.add_iphone()
+
 
 if __name__ == "__main__":
     main()

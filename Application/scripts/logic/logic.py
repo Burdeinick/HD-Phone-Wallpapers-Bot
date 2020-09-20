@@ -19,7 +19,7 @@ def send_error_message():
         requests.post(url, data=data)
 
     except Exception:
-        super_logger.error('Error send_message', exc_info=True) 
+        super_logger.error('Error send_message', exc_info=True)
 
 
 class ConnectionDB:
@@ -47,9 +47,14 @@ class RequestsDb:
         self.cursor = ConnectionDB().cursor
 
     def add_user_info(self, user_id: str) -> bool:
-        """The function returns True if new user added to DB else returns False."""
+        """The function returns True if new user
+        added to DB else returns False.
+
+        """
         try:
-            request = f"""INSERT INTO user(user_id, status_start, status_take_iphone)
+            request = f"""INSERT INTO user(user_id,
+                                           status_start,
+                                           status_take_iphone)
                           VALUES({user_id}, 1, 0)
                        """
             self.conn.execute(request)
@@ -64,7 +69,10 @@ class RequestsDb:
     def get_user_info(self, user_id: str) -> list:
         """The function returns info about one user."""
         try:
-            request = f"""SELECT user_id, id_iphone, status_start, status_take_iphone
+            request = f"""SELECT user_id,
+                                 id_iphone,
+                                 status_start,
+                                 status_take_iphone
                           FROM user
                           WHERE user_id = '{user_id}'
                        """
@@ -90,7 +98,10 @@ class RequestsDb:
             send_error_message()
 
     def set_status_take_iphone(self, user_id) -> bool:
-        """The function returns True if 'status_take_iphone' successfully set to True."""
+        """The function returns True if 'status_take_iphone'
+        successfully set to True.
+
+        """
         try:
             request = f"""UPDATE user
                           SET status_take_iphone = 1
@@ -106,7 +117,10 @@ class RequestsDb:
             return False
 
     def set_id_iphone(self, user_id: str, text_message: str) -> bool:
-        """The function returns True if request with SET 'id iphone' end successfully."""
+        """The function returns True if request with
+        SET 'id iphone' end successfully.
+
+        """
         try:
             request = f"""UPDATE user
                           SET id_iphone = (
@@ -126,10 +140,14 @@ class RequestsDb:
             return False
 
     def get_pixresolution(self, user_id: str) -> list:
-        """The function returns value resolution of need iphone model for it user."""
+        """The function returns value resolution of
+        need iphone model for it user.
+
+        """
         try:
             request = f"""SELECT val
-                            FROM pixresolution JOIN iphone USING(id_pixresolution)
+                            FROM pixresolution JOIN
+                            iphone USING(id_pixresolution)
                             JOIN user USING(id_iphone)
                             WHERE user_id = {user_id}
                        """
@@ -141,7 +159,10 @@ class RequestsDb:
             send_error_message()
 
     def del_user(self, user_id: str) -> bool:
-        """The function returns True if user was successfully deleted of DB else False."""
+        """The function returns True if user was
+        successfully deleted of DB else False.
+
+        """
         try:
             request = f"""DELETE FROM user
                           WHERE user_id = {user_id}
@@ -164,8 +185,8 @@ class RequestsDb:
 
         except Exception:
             super_logger.error('Error get_all_users', exc_info=True)
-            send_error_message()   
-            
+            send_error_message()
+
 
 class Telegram:
     """The class for work with Telegram API."""
@@ -193,25 +214,29 @@ class Telegram:
         try:
             get_info = self.request_db.get_iphone_info()
             lst_iphones = self.hand_req_db.hand_iphone_info(get_info)
-            self.button(lst_iphones, user_id, text="Выберете модель Вашего iPhone 👇🏻")
+            text = "Выберете модель Вашего iPhone 👇🏻"
+            self.button(lst_iphones, user_id, text=text)
 
         except Exception:
             super_logger.error('Error select_iphone', exc_info=True)
             send_error_message()
 
-    def get_picture_chang_iph(self, user_id, text="Отлично! Я запомнил данную модель 😎"):
+    def chang_iph(self, user_id, text="Отлично! Я запомнил данную модель 😎"):
         """The function can call function for send buttons
         'Получить обои' and 'Изменить модель iphone'.
 
         """
         try:
-            title_button = [[{"text": "Получить обои"}], [{"text": "Изменить модель iPhone"}]]
+            title_button = [
+                            [{"text": "Получить обои"}],
+                            [{"text": "Изменить модель iPhone"}]
+                            ]
             self.button(title_button, user_id, text)
 
         except Exception:
             super_logger.error('Error get_picture_chang_iph', exc_info=True)
             send_error_message()
-    
+
     def get_start_butt(self, user_id, text):
         """The function can call function for send button 'Начать'."""
         try:
@@ -219,18 +244,22 @@ class Telegram:
             self.button(title_button, user_id, text)
 
         except Exception:
-            super_logger.error('Error get_picture_chang_iph', exc_info=True)
+            super_logger.error('Error get_start_butt', exc_info=True)
             send_error_message()
 
     def button(self, title_button: list, user_id: str, text="👌"):
-        """The function can do request to telegram API for send buttons user."""
+        """The function can do request to
+        telegram API for send buttons user.
+
+        """
         try:
             method = "sendMessage"
             url = f"https://api.telegram.org/bot{token}/{method}"
-            reply = json.dumps({"keyboard": title_button, "resize_keyboard": True})
+            bt = {"keyboard": title_button, "resize_keyboard": True}
+            reply = json.dumps(bt)
             params = {"chat_id": user_id, "reply_markup": reply, "text": text}
             requests.post(url, params)
-        
+
         except Exception:
             super_logger.error('Error button', exc_info=True)
             send_error_message()
@@ -241,7 +270,7 @@ class HandlerReqDb:
     def __init__(self):
         """The method creates instances of classes
         'ConnectionDB().conn' and 'RequestsDb()' for further use.
-        
+
         """
         self.connect_db = ConnectionDB().conn
         self.request_db = RequestsDb()
@@ -249,7 +278,7 @@ class HandlerReqDb:
     def hand_iphone_info(self, iphone_info: list) -> list:
         """The function folds all  the models iphone
         of DB and send их for display in Telegram.
-        
+
         """
         try:
             buttons_lst = []
@@ -257,7 +286,7 @@ class HandlerReqDb:
                 title_iphone = i[0]
                 buttons_lst.append([{"text": f"{title_iphone}"}])
             return buttons_lst
-        
+
         except Exception:
             super_logger.error('Error hand_iphone_info', exc_info=True)
             send_error_message()
@@ -306,7 +335,7 @@ class HandlerReqDb:
     async def hand_get_pixresolution(self, chat_id) -> tuple:
         """The function parses resolution of
         iPhone and return tuple with two values resolution.
-        
+
         """
         try:
             all_pix = self.request_db.get_pixresolution(chat_id)
@@ -319,10 +348,11 @@ class HandlerReqDb:
             super_logger.error('Error hand_get_pixresolution', exc_info=True)
             send_error_message()
 
+
 class HandlerServer:
     """The class can to process requests
     regarding the text that is written in them.
-    
+
     """
     def __init__(self, request_json):
         """This constructor creates instances classes
@@ -349,7 +379,7 @@ class HandlerServer:
                 status_take_iphone = self.hand_req_db.get_status_take_iphone(self.chat_id)
                 if status_take_iphone:
                     text = "Вы уже запустили бота 👌"
-                    self.teleg.get_picture_chang_iph(self.chat_id, text=text)
+                    self.teleg.chang_iph(self.chat_id, text=text)
                 else:
                     self.teleg.select_iphone(self.chat_id)
 
@@ -363,10 +393,10 @@ class HandlerServer:
             user_exist = self.hand_req_db.user_exist(self.chat_id)
             if user_exist:
                 stat_take_iphone = self.request_db.set_status_take_iphone(self.chat_id)
-                set_id_iphone = self.request_db.set_id_iphone(self.chat_id, self.text_message)  # пользователю присваивается id_iphone
+                set_id_iphone = self.request_db.set_id_iphone(self.chat_id, self.text_message)
                 if stat_take_iphone and set_id_iphone:
                     text = "Модель iPhone успешно выбранна 👌"
-                    self.teleg.get_picture_chang_iph(self.chat_id, text=text)
+                    self.teleg.chang_iph(self.chat_id, text=text)
 
         except Exception:
             super_logger.error('Error any_iphon_command', exc_info=True)
@@ -377,7 +407,8 @@ class HandlerServer:
         try:
             del_user = self.request_db.del_user(self.chat_id)
             if del_user:
-                text = """Если Вы вновь захотите воспользоваться ботом, нажмите - "Начать" 👇🏻"""
+                text = f"""Если Вы вновь захотите воспользоваться ботом,
+                           нажмите - "Начать" 👇🏻"""
                 self.teleg.get_start_butt(self.chat_id, text)
 
         except Exception:
@@ -390,14 +421,14 @@ class HandlerServer:
             if text_message == "Получить обои":
                 user_exist = self.hand_req_db.user_exist(chat_id)
                 stat_take_iphone = self.request_db.set_status_take_iphone(chat_id)
-                if user_exist and stat_take_iphone:  # если пользователь есть в БД и он уже выбрал модель своего айфона
+                if user_exist and stat_take_iphone:
                     return True
                 return False
 
         except Exception:
             super_logger.error('Error chec_det_wal', exc_info=True)
             send_error_message()
-    
+
     async def my_users(self, chat_id):
         """The function call function of sending messages to user."""
         try:
@@ -411,7 +442,7 @@ class HandlerServer:
             super_logger.error('Error my_users', exc_info=True)
             send_error_message()
 
-    async def select_comand(self):  
+    async def select_comand(self):
         """The function chooses regarding "text_message" that do further."""
         try:
             if self.text_message == "/start" or self.text_message == "Начать":

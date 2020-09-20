@@ -3,11 +3,9 @@ from scripts.logic.logic import RequestsDb
 from scripts.logic.logic import HandlerReqDb
 from scripts.logic.logic import HandlerServer
 from scripts.logic.logic import send_error_message
-
 from logger.log import MyLogging
-
-
 from TOKEN import token, my_chat_id
+
 import time
 import asyncio
 import aiohttp
