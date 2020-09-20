@@ -2,7 +2,7 @@ from scripts.logic.logic import Telegram
 from scripts.logic.logic import RequestsDb
 from scripts.logic.logic import HandlerReqDb
 from scripts.logic.logic import HandlerServer
-from scripts.logic.logic import get_logfile_inf
+from scripts.logic.logic import send_error_message
 
 from logger.log import MyLogging
 
@@ -40,9 +40,9 @@ async def receive_update(request):
                 text = "Секундочку, Ваши обои уже ждут встречи с Вами \U0001f929"
                 await teleg.send_message(chat_id, text)
                 pix = await hand_req_db.hand_get_pixresolution(chat_id)
-                pix_1, pix_2 = pix[0], pix[1]
+                width, height = pix[0], pix[1]
                 
-                async with session.get(f"https://picsum.photos/{pix_1}/{pix_2}") as ses_get:
+                async with session.get(f"https://picsum.photos/{width}/{height}") as ses_get:
                     url_foto = str(ses_get.url)
                     method = "sendPhoto"
                     data = {"chat_id": chat_id, "photo": url_foto}
@@ -55,3 +55,4 @@ async def receive_update(request):
 
     except Exception:
         super_logger.error('Error receive_update', exc_info=True)
+        send_error_message()

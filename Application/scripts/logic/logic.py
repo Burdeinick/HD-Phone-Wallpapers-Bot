@@ -9,11 +9,17 @@ super_logger = MyLogging().setup_logger('logic',
                                         'Application/logger/logfile.log')
 
 
-def get_logfile_inf():
-    """ """
-    with open("Application/logger/logfile.log", "r") as f:
-        errors = f.read()
-        return errors
+def send_error_message():
+    """The function can send message that have error."""
+    try:
+        method = "sendMessage"
+        text = f"Что-то рухнуло иди смотреть в logfile.log"
+        url = f"https://api.telegram.org/bot{token}/{method}"
+        data = {"chat_id": my_chat_id, "text": text}
+        requests.post(url, data=data)
+
+    except Exception:
+        super_logger.error('Error send_message', exc_info=True) 
 
 
 class ConnectionDB:
@@ -30,6 +36,7 @@ class ConnectionDB:
             json_str = json.loads(json_str)
         dbname = str(json_str['data_base']['dbname'])
         return (dbname, )
+
 
 class RequestsDb:
     """Class for requests DB.
@@ -51,6 +58,7 @@ class RequestsDb:
 
         except Exception:
             super_logger.error('Error add_user_info', exc_info=True)
+            send_error_message()
             return False
 
     def get_user_info(self, user_id: str) -> list:
@@ -65,6 +73,7 @@ class RequestsDb:
 
         except Exception:
             super_logger.error('Error get_user_info', exc_info=True)
+            send_error_message()
 
     def get_iphone_info(self) -> list:
         """The function returns info list about 'iphone'."""
@@ -77,7 +86,8 @@ class RequestsDb:
             return self.cursor.fetchall()
 
         except Exception:
-            super_logger.error('Error get_iphone_info', exc_info=True)     
+            super_logger.error('Error get_iphone_info', exc_info=True)
+            send_error_message()
 
     def set_status_take_iphone(self, user_id) -> bool:
         """The function returns True if 'status_take_iphone' successfully set to True."""
@@ -92,6 +102,7 @@ class RequestsDb:
 
         except Exception:
             super_logger.error('Error', exc_info=True)
+            send_error_message()
             return False
 
     def set_id_iphone(self, user_id: str, text_message: str) -> bool:
@@ -111,6 +122,7 @@ class RequestsDb:
 
         except Exception:
             super_logger.error('Error set_id_iphone', exc_info=True)
+            send_error_message()
             return False
 
     def get_pixresolution(self, user_id: str) -> list:
@@ -125,8 +137,8 @@ class RequestsDb:
             return self.cursor.fetchall()
 
         except Exception:
-            super_logger.error('Error get_iphone_info', exc_info=True)  
-
+            super_logger.error('Error get_iphone_info', exc_info=True)
+            send_error_message()
 
     def del_user(self, user_id: str) -> bool:
         """The function returns True if user was successfully deleted of DB else False."""
@@ -140,6 +152,7 @@ class RequestsDb:
 
         except Exception:
             super_logger.error('Error del_user', exc_info=True)
+            send_error_message()
             return False
 
     def get_all_users(self) -> list:
@@ -151,7 +164,8 @@ class RequestsDb:
 
         except Exception:
             super_logger.error('Error get_all_users', exc_info=True)
-
+            send_error_message()   
+            
 
 class Telegram:
     """The class for work with Telegram API."""
@@ -168,7 +182,8 @@ class Telegram:
             requests.post(url, data=data)
 
         except Exception:
-            super_logger.error('Error send_message', exc_info=True) 
+            super_logger.error('Error send_message', exc_info=True)
+            send_error_message()
 
     def select_iphone(self, user_id):
         """The function can call function for send buttons to
@@ -182,6 +197,7 @@ class Telegram:
 
         except Exception:
             super_logger.error('Error select_iphone', exc_info=True)
+            send_error_message()
 
     def get_picture_chang_iph(self, user_id, text="Отлично! Я запомнил данную модель 😎"):
         """The function can call function for send buttons
@@ -194,6 +210,7 @@ class Telegram:
 
         except Exception:
             super_logger.error('Error get_picture_chang_iph', exc_info=True)
+            send_error_message()
     
     def get_start_butt(self, user_id, text):
         """The function can call function for send button 'Начать'."""
@@ -203,6 +220,7 @@ class Telegram:
 
         except Exception:
             super_logger.error('Error get_picture_chang_iph', exc_info=True)
+            send_error_message()
 
     def button(self, title_button: list, user_id: str, text="👌"):
         """The function can do request to telegram API for send buttons user."""
@@ -215,6 +233,7 @@ class Telegram:
         
         except Exception:
             super_logger.error('Error button', exc_info=True)
+            send_error_message()
 
 
 class HandlerReqDb:
@@ -241,6 +260,7 @@ class HandlerReqDb:
         
         except Exception:
             super_logger.error('Error hand_iphone_info', exc_info=True)
+            send_error_message()
 
     def user_exist(self, user_id: str) -> bool:
         """The function return 'True' if user exist to DB."""
@@ -252,6 +272,7 @@ class HandlerReqDb:
 
         except Exception:
             super_logger.error('Error user_exist', exc_info=True)
+            send_error_message()
             return False
 
     def get_iphone_list(self) -> list:
@@ -263,6 +284,7 @@ class HandlerReqDb:
 
         except Exception:
             super_logger.error('Error get_iphone_list', exc_info=True)
+            send_error_message()
 
     def get_status_take_iphone(self, user_id: str) -> bool:
         """The function return 'True' if
@@ -279,6 +301,7 @@ class HandlerReqDb:
 
         except Exception:
             super_logger.error('Error get_status_take_iphone', exc_info=True)
+            send_error_message()
 
     async def hand_get_pixresolution(self, chat_id) -> tuple:
         """The function parses resolution of
@@ -294,6 +317,7 @@ class HandlerReqDb:
 
         except Exception:
             super_logger.error('Error hand_get_pixresolution', exc_info=True)
+            send_error_message()
 
 class HandlerServer:
     """The class can to process requests
@@ -331,6 +355,7 @@ class HandlerServer:
 
         except Exception:
             super_logger.error('Error start_command', exc_info=True)
+            send_error_message()
 
     def any_iphon_command(self):
         """The function run when getting  commands any name iphone из DB."""
@@ -345,6 +370,7 @@ class HandlerServer:
 
         except Exception:
             super_logger.error('Error any_iphon_command', exc_info=True)
+            send_error_message()
 
     def stop_command(self):
         """The function run when getting "/stop" command."""
@@ -356,6 +382,7 @@ class HandlerServer:
 
         except Exception:
             super_logger.error('Error stop_command', exc_info=True)
+            send_error_message()
 
     async def chec_det_wal(self, text_message, chat_id):
         """The function run when getting "Получить обои" command."""
@@ -369,6 +396,7 @@ class HandlerServer:
 
         except Exception:
             super_logger.error('Error chec_det_wal', exc_info=True)
+            send_error_message()
     
     async def my_users(self, chat_id):
         """The function call function of sending messages to user."""
@@ -381,6 +409,7 @@ class HandlerServer:
 
         except Exception:
             super_logger.error('Error my_users', exc_info=True)
+            send_error_message()
 
     async def select_comand(self):  
         """The function chooses regarding "text_message" that do further."""
@@ -402,3 +431,4 @@ class HandlerServer:
 
         except Exception:
             super_logger.error('Error select_comand', exc_info=True)
+            send_error_message()
