@@ -5,7 +5,7 @@ from aiohttp import web
 
 
 def get_config():
-    with open('Application/config.json') as config:
+    with open('config.json') as config:
         json_str = config.read()
         json_str = json.loads(json_str)
 
@@ -19,7 +19,7 @@ host, port = get_config()
 
 def main():
     app.router.add_route("POST", "/", receive_update)
-    web.run_app(app, host=host, port=port)
+    web.run_app(app)
 
 
 if __name__ == "__main__":

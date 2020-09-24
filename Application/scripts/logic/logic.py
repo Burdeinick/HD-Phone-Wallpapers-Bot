@@ -6,7 +6,7 @@ from TOKEN import token, my_chat_id
 
 
 super_logger = MyLogging().setup_logger('logic',
-                                        'Application/logger/logfile.log')
+                                        'logger/logfile.log')
 
 
 def send_error_message():
@@ -31,7 +31,7 @@ class ConnectionDB:
 
     def get_config_db(self) -> tuple:
         """The method getting informations of configuration file."""
-        with open('Application/config.json') as config:
+        with open('config.json') as config:
             json_str = config.read()
             json_str = json.loads(json_str)
         dbname = str(json_str['data_base']['dbname'])

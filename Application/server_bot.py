@@ -15,15 +15,15 @@ teleg = Telegram()
 hand_req_db = HandlerReqDb()
 hand_serv = HandlerServer
 
-
 super_logger = MyLogging().setup_logger('server_bot',
-                                        'Application/logger/logfile.log')
+                                        'logger/logfile.log')
 
 
 async def receive_update(request):
     try:
         async with aiohttp.ClientSession() as session:
             req = await request.json()
+            print(req)
             h_s = hand_serv(req)
             chat_id = h_s.chat_id
             text_message = h_s.text_message
