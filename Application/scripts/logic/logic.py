@@ -2,11 +2,11 @@ import json
 import sqlite3
 import requests
 from logger.log import MyLogging
-from TOKEN import token, my_chat_id
+from config import TOKEN, MY_ID_CHAT, DATE_BASE
 
 
 super_logger = MyLogging().setup_logger('logic',
-                                        'logger/logfile.log')
+                                        'Application/logger/logfile.log')
 
 
 def send_error_message():
@@ -14,8 +14,8 @@ def send_error_message():
     try:
         method = "sendMessage"
         text = f"Что-то рухнуло иди смотреть в logfile.log"
-        url = f"https://api.telegram.org/bot{token}/{method}"
-        data = {"chat_id": my_chat_id, "text": text}
+        url = f"https://api.telegram.org/bot{TOKEN}/{method}"
+        data = {"chat_id": MY_ID_CHAT, "text": text}
         requests.post(url, data=data)
 
     except Exception:
@@ -25,17 +25,9 @@ def send_error_message():
 class ConnectionDB:
     """Class for connect to DB."""
     def __init__(self):
-        self.dbname = self.get_config_db()[0]
+        self.dbname = DATE_BASE['dbname']
         self.conn = sqlite3.connect(self.dbname, check_same_thread=False)
         self.cursor = self.conn.cursor()
-
-    def get_config_db(self) -> tuple:
-        """The method getting informations of configuration file."""
-        with open('config.json') as config:
-            json_str = config.read()
-            json_str = json.loads(json_str)
-        dbname = str(json_str['data_base']['dbname'])
-        return (dbname, )
 
 
 class RequestsDb:
@@ -198,7 +190,7 @@ class Telegram:
         """The function can send message necessary user."""
         try:
             method = "sendMessage"
-            url = f"https://api.telegram.org/bot{token}/{method}"
+            url = f"https://api.telegram.org/bot{TOKEN}/{method}"
             data = {"chat_id": chat_id, "text": text}
             requests.post(url, data=data)
 
@@ -254,7 +246,7 @@ class Telegram:
         """
         try:
             method = "sendMessage"
-            url = f"https://api.telegram.org/bot{token}/{method}"
+            url = f"https://api.telegram.org/bot{TOKEN}/{method}"
             bt = {"keyboard": title_button, "resize_keyboard": True}
             reply = json.dumps(bt)
             params = {"chat_id": user_id, "reply_markup": reply, "text": text}

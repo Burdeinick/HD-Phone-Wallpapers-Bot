@@ -7,7 +7,7 @@ from scripts.logic.logic import HandlerReqDb
 from scripts.logic.logic import HandlerServer
 from scripts.logic.logic import send_error_message
 from logger.log import MyLogging
-from TOKEN import token, my_chat_id
+from config import TOKEN
 
 
 app = web.Application()
@@ -16,14 +16,13 @@ hand_req_db = HandlerReqDb()
 hand_serv = HandlerServer
 
 super_logger = MyLogging().setup_logger('server_bot',
-                                        'logger/logfile.log')
+                                        'Application/logger/logfile.log')
 
 
 async def receive_update(request):
     try:
         async with aiohttp.ClientSession() as session:
             req = await request.json()
-            print(req)
             h_s = hand_serv(req)
             chat_id = h_s.chat_id
             text_message = h_s.text_message
@@ -39,7 +38,7 @@ async def receive_update(request):
                     url_foto = str(ses_get.url)
                     method = "sendPhoto"
                     data = {"chat_id": chat_id, "photo": url_foto}
-                    await session.post(f"https://api.telegram.org/bot{token}/{method}", data=data)
+                    await session.post(f"https://api.telegram.org/bot{TOKEN}/{method}", data=data)
             else:
                 await h_s.select_comand()
 
